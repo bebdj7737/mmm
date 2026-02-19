@@ -895,6 +895,38 @@ isFirstRedAfterGreen = isRed and greenCount[1] >= minRedCandles
 var string pivotDetectorResult = ""
 var int    barsInPosition      = 0
 
+// ─── ЛОНГ: состояние позиции ─────────────────────────────────────────────
+var string lBuyReason   = ""
+var bool   longIsOpen   = false
+var float  lEntryPrice  = na
+var int    lEntryBar    = na
+
+// ─── ШОРТ: состояние позиции ─────────────────────────────────────────────
+var bool   shortIsOpen  = false
+var float  sEntryPrice  = na
+var int    sEntryBar    = na
+var string sEntryReason = ""
+
+// ─── ЛОНГ: логика продажи ────────────────────────────────────────────────
+var float  lTrailStop   = na
+var bool   lStopActive  = false
+var string lSellReason  = ""
+var int    lPhase       = 0
+var int    lSignalBar   = na
+var bool   lHhFound     = false
+var float  lHhVal       = na
+var float  lPivotRef    = na
+
+// ─── ШОРТ: логика закрытия ───────────────────────────────────────────────
+var float  sTrailStop   = na
+var bool   sStopActive  = false
+var string sCloseReason = ""
+var int    sPhase       = 0
+var int    sSignalBar   = na
+var bool   sLlFound     = false
+var float  sLlVal       = na
+var float  sPivotRefL   = na
+
 // Подсчёт баров в позиции
 if strategy.position_size != 0
     barsInPosition := barsInPosition + 1
@@ -905,7 +937,7 @@ else
 // ЛОГИКА ЛОНГА
 // ═══════════════════════════════════════════════════════════════════════════
 
-var string lBuyReason  = ""
+lBuyReason  = ""
 lBuySignal = false
 
 if enableLong and isFirstGreenAfterRed and strategy.position_size == 0
@@ -1035,10 +1067,6 @@ if lBuySignal
         if checkRange(0, lbbVfiBars - 1, vfi, lbbVfiOp, lbbVfiVal)
             lBuyBlocked := true
 
-var float lEntryPrice = na
-var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
-var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
-
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в лонг (если включён)
     pivotEntryOk = true
@@ -1079,16 +1107,6 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОГИКА ПРОДАЖИ (ЛОНГ)
 // ═══════════════════════════════════════════════════════════════════════════
-
-var float  lTrailStop  = na
-var bool   lStopActive = false
-var string lSellReason = ""
-
-var int   lPhase       = 0
-var int   lSignalBar   = na
-var bool  lHhFound     = false
-var float lHhVal       = na
-var float lPivotRef    = na
 
 // ── ПРЯМАЯ ПРОДАЖА ЛОНГ LSD1–LSD3 ────────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > lEntryBar — запрещаем продажу в баре входа
@@ -1322,7 +1340,7 @@ if strategy.position_size <= 0
 // ЛОГИКА ШОРТА
 // ═══════════════════════════════════════════════════════════════════════════
 
-var string sEntryReason = ""
+sEntryReason = ""
 sEntrySignal = false
 
 if enableShort and isFirstRedAfterGreen and strategy.position_size == 0
@@ -1452,10 +1470,6 @@ if sEntrySignal
         if checkRange(0, sbbVfiBars - 1, vfi, sbbVfiOp, sbbVfiVal)
             sEntryBlocked := true
 
-var float sEntryPrice = na
-var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
-var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
-
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в шорт (если включён)
     pivotEntryOk = true
@@ -1496,16 +1510,6 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОГИКА ЗАКРЫТИЯ ШОРТА
 // ═══════════════════════════════════════════════════════════════════════════
-
-var float  sTrailStop   = na
-var bool   sStopActive  = false
-var string sCloseReason = ""
-
-var int   sPhase       = 0
-var int   sSignalBar   = na
-var bool  sLlFound     = false
-var float sLlVal       = na
-var float sPivotRefL   = na
 
 // ── ПРЯМОЕ ЗАКРЫТИЕ ШОРТА SSD1–SSD3 ─────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > sEntryBar — запрещаем закрытие в баре входа
