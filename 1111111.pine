@@ -787,11 +787,11 @@ plRaw = ta.pivotlow(pivLb, pivRb)
 var float[] pivValues = array.new_float(0)
 var int[]   pivBars   = array.new_int(0)
 var string[] pivTypes = array.new_string(0)
-int MAX_PIVOTS = 100
+int maxPivots = 100
 
 // При обнаружении нового пивота — классифицировать его
 if not na(phRaw)
-    pivType = "LH"  // default
+    pivType = "HH"  // default для первого high-пивота
     // Найти предыдущий high-пивот
     prevHighIdx = -1
     for i = array.size(pivTypes) - 1 to 0
@@ -801,18 +801,16 @@ if not na(phRaw)
     if prevHighIdx >= 0
         prevHighVal = array.get(pivValues, prevHighIdx)
         pivType := phRaw > prevHighVal ? "HH" : "LH"
-    else
-        pivType := "HH"  // первый high-пивот
     array.push(pivValues, phRaw)
     array.push(pivBars,   bar_index - pivRb)
     array.push(pivTypes,  pivType)
-    if array.size(pivValues) > MAX_PIVOTS
+    if array.size(pivValues) > maxPivots
         array.shift(pivValues)
         array.shift(pivBars)
         array.shift(pivTypes)
 
 if not na(plRaw)
-    pivType = "HL"  // default
+    pivType = "HL"  // default для первого low-пивота
     prevLowIdx = -1
     for i = array.size(pivTypes) - 1 to 0
         if array.get(pivTypes, i) == "HL" or array.get(pivTypes, i) == "LL"
@@ -821,12 +819,10 @@ if not na(plRaw)
     if prevLowIdx >= 0
         prevLowVal = array.get(pivValues, prevLowIdx)
         pivType := plRaw > prevLowVal ? "HL" : "LL"
-    else
-        pivType := "HL"  // первый low-пивот
     array.push(pivValues, plRaw)
     array.push(pivBars,   bar_index - pivRb)
     array.push(pivTypes,  pivType)
-    if array.size(pivValues) > MAX_PIVOTS
+    if array.size(pivValues) > maxPivots
         array.shift(pivValues)
         array.shift(pivBars)
         array.shift(pivTypes)
@@ -1064,7 +1060,10 @@ var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар вх
 
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в лонг (если включён)
-    pivotEntryOk = not usePivotFilterLongEntry or checkPivotFilter(pLBUseA, pLBFirstA, pLBSecondA, pLBUseB, pLBFirstB, pLBSecondB, pLBUseC, pLBFirstC, pLBSecondC, pLBUseD, pLBFirstD, pLBSecondD, bar_index, pLBWindowBack, pLBWindowFwd)
+    pivotEntryOk = not usePivotFilterLongEntry or checkPivotFilter(
+         pLBUseA, pLBFirstA, pLBSecondA, pLBUseB, pLBFirstB, pLBSecondB, 
+         pLBUseC, pLBFirstC, pLBSecondC, pLBUseD, pLBFirstD, pLBSecondD, 
+         bar_index, pLBWindowBack, pLBWindowFwd)
             
     if pivotEntryOk
         // Флип: закрываем противоположную позицию если allowFlip = true
@@ -1284,7 +1283,10 @@ if strategy.position_size > 0 and lPhase == 1
 
 if strategy.position_size > 0 and lPhase == 2
     // Use new checkPivotFilter for long exit
-    pivotExitOk = checkPivotFilter(pLEUseA, pLEFirstA, pLESecondA, pLEUseB, pLEFirstB, pLESecondB, pLEUseC, pLEFirstC, pLESecondC, pLEUseD, pLEFirstD, pLESecondD, lSignalBar, pLEWindowBack, pLEWindowFwd)
+    pivotExitOk = checkPivotFilter(
+        pLEUseA, pLEFirstA, pLESecondA, pLEUseB, pLEFirstB, pLESecondB, 
+        pLEUseC, pLEFirstC, pLESecondC, pLEUseD, pLEFirstD, pLESecondD, 
+        lSignalBar, pLEWindowBack, pLEWindowFwd)
     
     if pivotExitOk
         lTrailStop  := low[1]
@@ -1463,7 +1465,10 @@ var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар вх
 
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в шорт (если включён)
-    pivotEntryOk = not usePivotFilterShortEntry or checkPivotFilter(pSEUseA, pSEFirstA, pSESecondA, pSEUseB, pSEFirstB, pSESecondB, pSEUseC, pSEFirstC, pSESecondC, pSEUseD, pSEFirstD, pSESecondD, bar_index, pSEWindowBack, pSEWindowFwd)
+    pivotEntryOk = not usePivotFilterShortEntry or checkPivotFilter(
+         pSEUseA, pSEFirstA, pSESecondA, pSEUseB, pSEFirstB, pSESecondB, 
+         pSEUseC, pSEFirstC, pSESecondC, pSEUseD, pSEFirstD, pSESecondD, 
+         bar_index, pSEWindowBack, pSEWindowFwd)
             
     if pivotEntryOk
         // Флип: закрываем противоположную позицию если allowFlip = true
@@ -1684,7 +1689,10 @@ if strategy.position_size < 0 and sPhase == 1
 
 if strategy.position_size < 0 and sPhase == 2
     // Use new checkPivotFilter for short exit
-    pivotExitOk = checkPivotFilter(pSCUseA, pSCFirstA, pSCSecondA, pSCUseB, pSCFirstB, pSCSecondB, pSCUseC, pSCFirstC, pSCSecondC, pSCUseD, pSCFirstD, pSCSecondD, sSignalBar, pSCWindowBack, pSCWindowFwd)
+    pivotExitOk = checkPivotFilter(
+        pSCUseA, pSCFirstA, pSCSecondA, pSCUseB, pSCFirstB, pSCSecondB, 
+        pSCUseC, pSCFirstC, pSCSecondC, pSCUseD, pSCFirstD, pSCSecondD, 
+        sSignalBar, pSCWindowBack, pSCWindowFwd)
     
     if pivotExitOk
         sTrailStop  := high[1]
