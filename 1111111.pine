@@ -760,6 +760,40 @@ sbbVfiVal   = input.float(20,   "VFI за N свечей назад",           
 sbbVfiBars  = input.int(10,     "",                                   group="[ШОРТ] Фильтр блокировки входа", inline="sbbvfi", minval=1)
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ПЕРЕМЕННЫЕ СОСТОЯНИЯ ПОЗИЦИЙ
+// ═══════════════════════════════════════════════════════════════════════════
+
+var bool  longIsOpen    = false
+var bool  shortIsOpen   = false
+
+// Лонг — состояние
+var float lEntryPrice   = na
+var int   lEntryBar     = na
+var string lEntryReason = ""
+var string lCloseReason = ""
+var bool  lStopActive   = false
+var float lTrailStop    = na
+var int   lPhase        = 0
+var bool  lHhFound      = false
+var int   lSignalBar    = na
+var string lSellReason  = ""
+var float lHhVal        = na
+var float lPivotRef     = na
+
+// Шорт — состояние
+var float sEntryPrice   = na
+var int   sEntryBar     = na
+var string sEntryReason = ""
+var string sCloseReason = ""
+var bool  sStopActive   = false
+var float sTrailStop    = na
+var int   sPhase        = 0
+var bool  sLlFound      = false
+var int   sSignalBar    = na
+var float sLlVal        = na
+var float sPivotRefL    = na
+
+// ═══════════════════════════════════════════════════════════════════════════
 // РАСЧЁТ ИНДИКАТОРОВ
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1140,10 +1174,6 @@ if lBuySignal
         if checkRange(0, lbbVfiBars - 1, vfi, lbbVfiOp, lbbVfiVal)
             lBuyBlocked := true
 
-var float lEntryPrice = na
-var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
-var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
-
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в лонг
     pivotEntryOk = true
@@ -1200,16 +1230,6 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОГИКА ПРОДАЖИ (ЛОНГ)
 // ═══════════════════════════════════════════════════════════════════════════
-
-var float  lTrailStop  = na
-var bool   lStopActive = false
-var string lSellReason = ""
-
-var int   lPhase       = 0
-var int   lSignalBar   = na
-var bool  lHhFound     = false
-var float lHhVal       = na
-var float lPivotRef    = na
 
 // ── ПРЯМАЯ ПРОДАЖА ЛОНГ LSD1–LSD3 ────────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > lEntryBar — запрещаем продажу в баре входа
@@ -1441,7 +1461,6 @@ if lStopActive and longIsOpen
 // ЛОГИКА ШОРТА
 // ═══════════════════════════════════════════════════════════════════════════
 
-var string sEntryReason = ""
 sEntrySignal = false
 
 if enableShort and isFirstRedAfterGreen and not shortIsOpen
@@ -1571,10 +1590,6 @@ if sEntrySignal
         if checkRange(0, sbbVfiBars - 1, vfi, sbbVfiOp, sbbVfiVal)
             sEntryBlocked := true
 
-var float sEntryPrice = na
-var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
-var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
-
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в шорт
     pivotEntryOk = true
@@ -1631,16 +1646,6 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОГИКА ЗАКРЫТИЯ ШОРТА
 // ═══════════════════════════════════════════════════════════════════════════
-
-var float  sTrailStop   = na
-var bool   sStopActive  = false
-var string sCloseReason = ""
-
-var int   sPhase       = 0
-var int   sSignalBar   = na
-var bool  sLlFound     = false
-var float sLlVal       = na
-var float sPivotRefL   = na
 
 // ── ПРЯМОЕ ЗАКРЫТИЕ ШОРТА SSD1–SSD3 ─────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > sEntryBar — запрещаем закрытие в баре входа
