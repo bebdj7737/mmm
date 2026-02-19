@@ -895,7 +895,6 @@ isFirstRedAfterGreen = isRed and greenCount[1] >= minRedCandles
 var string pivotDetectorResult = ""
 var int    barsInPosition      = 0
 
-// Глобальные переменные для отслеживания позиций
 var bool  longIsOpen   = false
 var bool  shortIsOpen  = false
 var float lEntryPrice  = na
