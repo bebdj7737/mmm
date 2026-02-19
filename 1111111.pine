@@ -1141,6 +1141,7 @@ if lBuySignal
             lBuyBlocked := true
 
 var float lEntryPrice = na
+var float lStopPrice  = na
 var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
 var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
 
@@ -1191,14 +1192,16 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
             longIsOpen := true
             lEntryPrice := close
             lEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
-            // Find last LL/HL pivot low for stop
-            lStopPivotLow = low[1]
+            // Find most recent LL/HL pivot low for stop
+            lStopPivotLow    = low[1]
+            lStopPivotMaxBar = -1
             for _pi = 0 to array.size(plBarIndices) - 1
                 _pBar = array.get(plBarIndices, _pi)
                 if _pBar >= bar_index - signalWindowLong * 2 and _pBar <= bar_index
                     _pType = array.get(plTypes, _pi)
-                    if _pType == "LL" or _pType == "HL"
-                        lStopPivotLow := array.get(plValues, _pi)
+                    if (_pType == "LL" or _pType == "HL") and _pBar > lStopPivotMaxBar
+                        lStopPivotMaxBar := _pBar
+                        lStopPivotLow    := array.get(plValues, _pi)
             lStopPrice := lStopPivotLow - syminfo.mintick * 2
             if showLabels
                 label.new(bar_index, low,
@@ -1210,7 +1213,6 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
 // ЛОГИКА ПРОДАЖИ (ЛОНГ)
 // ═══════════════════════════════════════════════════════════════════════════
 
-var float  lStopPrice  = na
 var float  lTrailStop  = na
 var bool   lStopActive = false
 var string lSellReason = ""
@@ -1588,6 +1590,7 @@ if sEntrySignal
             sEntryBlocked := true
 
 var float sEntryPrice = na
+var float sStopPrice  = na
 var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
 var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
 
@@ -1638,14 +1641,16 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
             shortIsOpen := true
             sEntryPrice := close
             sEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
-            // Find last HH/LH pivot high for stop
-            sStopPivotHigh = high[1]
+            // Find most recent HH/LH pivot high for stop
+            sStopPivotHigh    = high[1]
+            sStopPivotMaxBar  = -1
             for _pi = 0 to array.size(phBarIndices) - 1
                 _pBar = array.get(phBarIndices, _pi)
                 if _pBar >= bar_index - signalWindowShort * 2 and _pBar <= bar_index
                     _pType = array.get(phTypes, _pi)
-                    if _pType == "HH" or _pType == "LH"
-                        sStopPivotHigh := array.get(phValues, _pi)
+                    if (_pType == "HH" or _pType == "LH") and _pBar > sStopPivotMaxBar
+                        sStopPivotMaxBar  := _pBar
+                        sStopPivotHigh    := array.get(phValues, _pi)
             sStopPrice := sStopPivotHigh + syminfo.mintick * 2
             if showLabels
                 label.new(bar_index, high,
@@ -1657,7 +1662,6 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
 // ЛОГИКА ЗАКРЫТИЯ ШОРТА
 // ═══════════════════════════════════════════════════════════════════════════
 
-var float  sStopPrice   = na
 var float  sTrailStop   = na
 var bool   sStopActive  = false
 var string sCloseReason = ""
