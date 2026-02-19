@@ -1037,6 +1037,7 @@ if lBuySignal
 
 var float lEntryPrice = na
 var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
+var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
 
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в лонг (если включён)
@@ -1051,12 +1052,22 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
             
     if pivotEntryOk
         // Флип: закрываем противоположную позицию если allowFlip = true
-        if strategy.position_size < 0 and allowFlip
+        if allowFlip and shortIsOpen
+            // Calculate P/L before closing
+            profitPct = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0
+            lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
             strategy.close("Short", comment="Закрыт при входе в Лонг (Flip)")
+            shortIsOpen := false
+            if showLabels
+                label.new(bar_index, high,
+                          "ЗАКРЫТИЕ ШОРТ (Flip)\nP/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
+                          color=lblColor, textcolor=color.white,
+                          style=label.style_label_down, size=size.small)
         
-        // Открываем лонг только если нет активной шорт позиции или allowFlip = true
-        if strategy.position_size >= 0 or allowFlip
+        // Открываем лонг только если он не открыт (если allowFlip=false) или всегда (если allowFlip=true)
+        if not longIsOpen or allowFlip
             strategy.entry("Long", strategy.long)
+            longIsOpen := true
             lEntryPrice := close
             lEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
             if showLabels
@@ -1279,6 +1290,7 @@ if lStopActive and strategy.position_size > 0
         profitPct = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0  // Fixed P/L calculation
         lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         strategy.close("Long", comment="Стоп Лонг")
+        longIsOpen := false  // Mark long as closed
         if showLabels
             label.new(bar_index, high,
                       "ПРОДАЖА ЛОНГ\n" + lSellReason +
@@ -1295,6 +1307,7 @@ if lStopActive and strategy.position_size > 0
 
 // Сброс при отсутствии лонг-позиции
 if strategy.position_size <= 0
+    longIsOpen  := false
     lStopActive := false
     lTrailStop  := na
     lPhase      := 0
@@ -1441,6 +1454,7 @@ if sEntrySignal
 
 var float sEntryPrice = na
 var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
+var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
 
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в шорт (если включён)
@@ -1455,12 +1469,22 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
             
     if pivotEntryOk
         // Флип: закрываем противоположную позицию если allowFlip = true
-        if strategy.position_size > 0 and allowFlip
+        if allowFlip and longIsOpen
+            // Calculate P/L before closing
+            profitPct = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0
+            lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
             strategy.close("Long", comment="Закрыт при входе в Шорт (Flip)")
+            longIsOpen := false
+            if showLabels
+                label.new(bar_index, low,
+                          "ЗАКРЫТИЕ ЛОНГ (Flip)\nP/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
+                          color=lblColor, textcolor=color.white,
+                          style=label.style_label_up, size=size.small)
         
-        // Открываем шорт только если нет активной лонг позиции или allowFlip = true
-        if strategy.position_size <= 0 or allowFlip
+        // Открываем шорт только если он не открыт (если allowFlip=false) или всегда (если allowFlip=true)
+        if not shortIsOpen or allowFlip
             strategy.entry("Short", strategy.short)
+            shortIsOpen := true
             sEntryPrice := close
             sEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
             if showLabels
@@ -1683,6 +1707,7 @@ if sStopActive and strategy.position_size < 0
         profitPct = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0  // Fixed P/L calculation
         lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         strategy.close("Short", comment="Стоп Шорт")
+        shortIsOpen := false  // Mark short as closed
         if showLabels
             label.new(bar_index, low,
                       "ЗАКРЫТИЕ ШОРТА\n" + sCloseReason +
@@ -1699,6 +1724,7 @@ if sStopActive and strategy.position_size < 0
 
 // Сброс при отсутствии шорт-позиции
 if strategy.position_size >= 0
+    shortIsOpen := false
     sStopActive := false
     sTrailStop  := na
     sPhase      := 0
