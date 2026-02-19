@@ -906,7 +906,8 @@ else
 // ═══════════════════════════════════════════════════════════════════════════
 
 var string lBuyReason  = ""
-lBuySignal = false
+var bool   lBuySignal  = false
+lBuySignal := false
 
 if enableLong and isFirstGreenAfterRed and strategy.position_size == 0
     rangeLen = redCount[1] + 1
@@ -1323,7 +1324,8 @@ if strategy.position_size <= 0
 // ═══════════════════════════════════════════════════════════════════════════
 
 var string sEntryReason = ""
-sEntrySignal = false
+var bool   sEntrySignal = false
+sEntrySignal := false
 
 if enableShort and isFirstRedAfterGreen and strategy.position_size == 0
     rangeLen = greenCount[1] + 1
