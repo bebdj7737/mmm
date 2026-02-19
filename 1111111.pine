@@ -895,6 +895,12 @@ isFirstRedAfterGreen = isRed and greenCount[1] >= minRedCandles
 var string pivotDetectorResult = ""
 var int    barsInPosition      = 0
 
+// Глобальные переменные для отслеживания позиций
+var bool  longIsOpen   = false
+var bool  shortIsOpen  = false
+var float lEntryPrice  = na
+var float sEntryPrice  = na
+
 // Подсчёт баров в позиции
 if strategy.position_size != 0
     barsInPosition := barsInPosition + 1
@@ -1035,9 +1041,7 @@ if lBuySignal
         if checkRange(0, lbbVfiBars - 1, vfi, lbbVfiOp, lbbVfiVal)
             lBuyBlocked := true
 
-var float lEntryPrice = na
 var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
-var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
 
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в лонг (если включён)
@@ -1452,9 +1456,7 @@ if sEntrySignal
         if checkRange(0, sbbVfiBars - 1, vfi, sbbVfiOp, sbbVfiVal)
             sEntryBlocked := true
 
-var float sEntryPrice = na
 var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
-var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
 
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
     // Проверка пивот-фильтра для входа в шорт (если включён)
