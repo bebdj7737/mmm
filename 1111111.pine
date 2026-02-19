@@ -1,7 +1,7 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 //@version=5
 strategy("RSI & VFI Стратегия + ADX + HH/LH [Long+Short]", overlay=true,
-         initial_capital=10000, pyramiding=0,
+         initial_capital=10000, pyramiding=2,
          default_qty_type=strategy.percent_of_equity, default_qty_value=100,
          close_entries_rule="ANY")
 
@@ -38,32 +38,88 @@ adxLen = 14  // Fixed period for ADX/DI calculation
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Пивот-фильтр: Закрытие Лонга
-usePivotFilterLongExit   = input.bool(true,   "Включить фильтр",                        group="HH/LH Фильтр: Закрытие Лонга")
-pivotLongExitFirst       = input.string("HH", "Первый пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
-pivotLongExitSecond      = input.string("LH", "Второй пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
-pivotLongExitWinBack     = input.int(5,       "Окно назад (свечей)", minval=0,          group="HH/LH Фильтр: Закрытие Лонга")
-pivotLongExitWinFwd      = input.int(5,       "Окно вперёд (свечей)", minval=0,         group="HH/LH Фильтр: Закрытие Лонга")
+// Вариант A
+usePivotLongExitA        = input.bool(true,  "Вариант A", group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitAFirst      = input.string("HH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitASecond     = input.string("LH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+// Вариант B
+usePivotLongExitB        = input.bool(false, "Вариант B", group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitBFirst      = input.string("HL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitBSecond     = input.string("LL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+// Вариант C
+usePivotLongExitC        = input.bool(false, "Вариант C", group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitCFirst      = input.string("LL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitCSecond     = input.string("HL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+// Вариант D
+usePivotLongExitD        = input.bool(false, "Вариант D", group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitDFirst      = input.string("HL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitDSecond     = input.string("HH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Лонга")
+// Общее окно
+pivotLongExitWinBack     = input.int(5, "Окно назад (свечей)", minval=0, group="HH/LH Фильтр: Закрытие Лонга")
+pivotLongExitWinFwd      = input.int(5, "Окно вперёд (свечей)", minval=0, group="HH/LH Фильтр: Закрытие Лонга")
 
 // Пивот-фильтр: Открытие Лонга
-usePivotFilterLongEntry  = input.bool(false,  "Включить фильтр",                        group="HH/LH Фильтр: Открытие Лонга")
-pivotLongEntryFirst      = input.string("LL", "Первый пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
-pivotLongEntrySecond     = input.string("HL", "Второй пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
-pivotLongEntryWinBack    = input.int(5,       "Окно назад (свечей)", minval=0,          group="HH/LH Фильтр: Открытие Лонга")
-pivotLongEntryWinFwd     = input.int(5,       "Окно вперёд (свечей)", minval=0,         group="HH/LH Фильтр: Открытие Лонга")
+// Вариант A
+usePivotLongEntryA       = input.bool(false, "Вариант A", group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryAFirst     = input.string("LL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryASecond    = input.string("HL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+// Вариант B
+usePivotLongEntryB       = input.bool(false, "Вариант B", group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryBFirst     = input.string("HL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryBSecond    = input.string("HH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+// Вариант C
+usePivotLongEntryC       = input.bool(false, "Вариант C", group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryCFirst     = input.string("LL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryCSecond    = input.string("LL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+// Вариант D
+usePivotLongEntryD       = input.bool(false, "Вариант D", group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryDFirst     = input.string("HH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryDSecond    = input.string("LH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Лонга")
+// Общее окно
+pivotLongEntryWinBack    = input.int(5, "Окно назад (свечей)", minval=0, group="HH/LH Фильтр: Открытие Лонга")
+pivotLongEntryWinFwd     = input.int(5, "Окно вперёд (свечей)", minval=0, group="HH/LH Фильтр: Открытие Лонга")
 
 // Пивот-фильтр: Закрытие Шорта
-usePivotFilterShortExit  = input.bool(true,   "Включить фильтр",                        group="HH/LH Фильтр: Закрытие Шорта")
-pivotShortExitFirst      = input.string("LL", "Первый пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
-pivotShortExitSecond     = input.string("HL", "Второй пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
-pivotShortExitWinBack    = input.int(5,       "Окно назад (свечей)", minval=0,          group="HH/LH Фильтр: Закрытие Шорта")
-pivotShortExitWinFwd     = input.int(5,       "Окно вперёд (свечей)", minval=0,         group="HH/LH Фильтр: Закрытие Шорта")
+// Вариант A
+usePivotShortExitA       = input.bool(true,  "Вариант A", group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitAFirst     = input.string("LL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitASecond    = input.string("HL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+// Вариант B
+usePivotShortExitB       = input.bool(false, "Вариант B", group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitBFirst     = input.string("HL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitBSecond    = input.string("HH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+// Вариант C
+usePivotShortExitC       = input.bool(false, "Вариант C", group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitCFirst     = input.string("HH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitCSecond    = input.string("HH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+// Вариант D
+usePivotShortExitD       = input.bool(false, "Вариант D", group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitDFirst     = input.string("LH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitDSecond    = input.string("LL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Закрытие Шорта")
+// Общее окно
+pivotShortExitWinBack    = input.int(5, "Окно назад (свечей)", minval=0, group="HH/LH Фильтр: Закрытие Шорта")
+pivotShortExitWinFwd     = input.int(5, "Окно вперёд (свечей)", minval=0, group="HH/LH Фильтр: Закрытие Шорта")
 
 // Пивот-фильтр: Открытие Шорта
-usePivotFilterShortEntry = input.bool(false,  "Включить фильтр",                        group="HH/LH Фильтр: Открытие Шорта")
-pivotShortEntryFirst     = input.string("HH", "Первый пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
-pivotShortEntrySecond    = input.string("LH", "Второй пивот",  options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
-pivotShortEntryWinBack   = input.int(5,       "Окно назад (свечей)", minval=0,          group="HH/LH Фильтр: Открытие Шорта")
-pivotShortEntryWinFwd    = input.int(5,       "Окно вперёд (свечей)", minval=0,         group="HH/LH Фильтр: Открытие Шорта")
+// Вариант A
+usePivotShortEntryA      = input.bool(false, "Вариант A", group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryAFirst    = input.string("HH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryASecond   = input.string("LH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+// Вариант B
+usePivotShortEntryB      = input.bool(false, "Вариант B", group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryBFirst    = input.string("LH", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryBSecond   = input.string("LL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+// Вариант C
+usePivotShortEntryC      = input.bool(false, "Вариант C", group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryCFirst    = input.string("LL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryCSecond   = input.string("HL", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+// Вариант D
+usePivotShortEntryD      = input.bool(false, "Вариант D", group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryDFirst    = input.string("HL", "Первый", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryDSecond   = input.string("HH", "Второй", options=["HH","LH","HL","LL"], group="HH/LH Фильтр: Открытие Шорта")
+// Общее окно
+pivotShortEntryWinBack   = input.int(5, "Окно назад (свечей)", minval=0, group="HH/LH Фильтр: Открытие Шорта")
+pivotShortEntryWinFwd    = input.int(5, "Окно вперёд (свечей)", minval=0, group="HH/LH Фильтр: Открытие Шорта")
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОНГ — НАСТРОЙКИ ВХОДА
@@ -809,9 +865,8 @@ checkRange(startBar, endBar, indicator, op, thresh) =>
 // УНИВЕРСАЛЬНЫЙ ДЕТЕКТОР ПИВОТ-ПАТТЕРНОВ (поддерживает все 16 комбинаций)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Детектор паттернов - ищет последовательность firstType → secondType в окне
-pivotPatternDetector(firstType, secondType, windowBack, windowFwd, signalBar) =>
-    string explanation = "No pattern"
+// Вспомогательная функция: поиск одной пары пивотов
+findSinglePivotPair(firstType, secondType, windowBack, windowFwd, signalBar) =>
     bool found = false
     
     // Determine which pivot arrays to use based on type
@@ -853,7 +908,6 @@ pivotPatternDetector(firstType, secondType, windowBack, windowFwd, signalBar) =>
                     if array.get(phTypes, i) == secondType
                         secondFoundBar := pivotBar
                         found := true
-                        explanation := firstType + "→" + secondType + " found"
                         break
         
         if not useHighSecond and array.size(plBarIndices) > 0
@@ -863,10 +917,61 @@ pivotPatternDetector(firstType, secondType, windowBack, windowFwd, signalBar) =>
                     if array.get(plTypes, i) == secondType
                         secondFoundBar := pivotBar
                         found := true
-                        explanation := firstType + "→" + secondType + " found"
                         break
     
-    [found, explanation]
+    found
+
+// Детектор паттернов с множественными вариантами (логика AND)
+// Возвращает true только если ВСЕ включённые варианты найдены
+pivotMultiPatternDetector(useA, firstA, secondA, useB, firstB, secondB, useC, firstC, secondC, useD, firstD, secondD, windowBack, windowFwd, signalBar) =>
+    // Проверяем сколько вариантов включено
+    enabledVariantCount = 0
+    if useA
+        enabledVariantCount := enabledVariantCount + 1
+    if useB
+        enabledVariantCount := enabledVariantCount + 1
+    if useC
+        enabledVariantCount := enabledVariantCount + 1
+    if useD
+        enabledVariantCount := enabledVariantCount + 1
+    
+    // Если ни один вариант не включён - фильтр отключён (пропускает всё)
+    if enabledVariantCount == 0
+        [true, "Фильтр отключен"]
+    else
+        // Проверяем каждый включённый вариант
+        foundVariantCount = 0
+        patternSummary = ""
+        
+        if useA
+            foundA = findSinglePivotPair(firstA, secondA, windowBack, windowFwd, signalBar)
+            if foundA
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "A:" + firstA + "→" + secondA + " "
+        
+        if useB
+            foundB = findSinglePivotPair(firstB, secondB, windowBack, windowFwd, signalBar)
+            if foundB
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "B:" + firstB + "→" + secondB + " "
+        
+        if useC
+            foundC = findSinglePivotPair(firstC, secondC, windowBack, windowFwd, signalBar)
+            if foundC
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "C:" + firstC + "→" + secondC + " "
+        
+        if useD
+            foundD = findSinglePivotPair(firstD, secondD, windowBack, windowFwd, signalBar)
+            if foundD
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "D:" + firstD + "→" + secondD + " "
+        
+        // Все включённые варианты должны быть найдены (AND logic)
+        allFound = (foundVariantCount == enabledVariantCount)
+        finalExpl = allFound ? patternSummary : "Не все варианты найдены"
+        
+        [allFound, finalExpl]
 
 // ═══════════════════════════════════════════════════════════════════════════
 // СВЕЧНОЙ ПАТТЕРН
@@ -908,7 +1013,7 @@ else
 var string lBuyReason  = ""
 lBuySignal = false
 
-if enableLong and isFirstGreenAfterRed and strategy.position_size == 0
+if enableLong and isFirstGreenAfterRed and not longIsOpen
     rangeLen = redCount[1] + 1
     anyMet   = false
 
@@ -1040,11 +1145,17 @@ var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар вх
 var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
 
 if lBuySignal and not lBuyBlocked and strategy.equity > 0
-    // Проверка пивот-фильтра для входа в лонг (если включён)
+    // Проверка пивот-фильтра для входа в лонг
     pivotEntryOk = true
-    if usePivotFilterLongEntry
+    anyVariantEnabled = usePivotLongEntryA or usePivotLongEntryB or usePivotLongEntryC or usePivotLongEntryD
+    if anyVariantEnabled
         searchFrom = na(lEntryBar) ? bar_index - 50 : lEntryBar  // Fallback для первого входа
-        [pivotFound, pivotExpl] = pivotPatternDetector(pivotLongEntryFirst, pivotLongEntrySecond, pivotLongEntryWinBack, pivotLongEntryWinFwd, searchFrom)
+        [pivotFound, pivotExpl] = pivotMultiPatternDetector(
+             usePivotLongEntryA, pivotLongEntryAFirst, pivotLongEntryASecond,
+             usePivotLongEntryB, pivotLongEntryBFirst, pivotLongEntryBSecond,
+             usePivotLongEntryC, pivotLongEntryCFirst, pivotLongEntryCSecond,
+             usePivotLongEntryD, pivotLongEntryDFirst, pivotLongEntryDSecond,
+             pivotLongEntryWinBack, pivotLongEntryWinFwd, searchFrom)
         if pivotFound
             pivotDetectorResult := "Long Entry: " + pivotExpl
         else
@@ -1057,7 +1168,17 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
             profitPct = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0
             lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
             strategy.close("Short", comment="Закрыт при входе в Лонг (Flip)")
+            // Reset all short state variables
             shortIsOpen := false
+            sStopActive := false
+            sTrailStop  := na
+            sPhase      := 0
+            sLlFound    := false
+            sSignalBar  := na
+            sEntryPrice := na
+            sEntryBar   := na
+            sEntryReason := ""
+            sCloseReason := ""
             if showLabels
                 label.new(bar_index, high,
                           "ЗАКРЫТИЕ ШОРТ (Flip)\nP/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
@@ -1092,7 +1213,7 @@ var float lPivotRef    = na
 
 // ── ПРЯМАЯ ПРОДАЖА ЛОНГ LSD1–LSD3 ────────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > lEntryBar — запрещаем продажу в баре входа
-if strategy.position_size > 0 and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_index > lEntryBar)
+if longIsOpen and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_index > lEntryBar)
     directSellMet = false
     directSellRsn = ""
     if not directSellMet and enableLSD1
@@ -1122,7 +1243,7 @@ lSellMet    = false
 lCurSellRsn = ""
 
 // ← ЗАЩИТА: проверяем bar_index > lEntryBar — запрещаем продажу в баре входа
-if strategy.position_size > 0 and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_index > lEntryBar)
+if longIsOpen and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_index > lEntryBar)
     if not lSellMet and enableLS1
         if checkRange(0, sellWindowBars, rsi, ls1RsiOp, ls1RsiVal) and checkRange(0, sellWindowBars, vfi, ls1VfiOp, ls1VfiVal)
             lSellMet := true
@@ -1256,7 +1377,8 @@ if strategy.position_size > 0 and lPhase == 0 and not lStopActive and (na(lEntry
 
     if lSellMet
         lSellReason := lCurSellRsn
-        if usePivotFilterLongExit
+        anyVariantEnabled = usePivotLongExitA or usePivotLongExitB or usePivotLongExitC or usePivotLongExitD
+        if anyVariantEnabled
             lPhase    := 2
             lHhFound  := false
             lPivotRef := ta.valuewhen(not na(ph), ph, 0)
@@ -1264,12 +1386,17 @@ if strategy.position_size > 0 and lPhase == 0 and not lStopActive and (na(lEntry
             lTrailStop  := low[1]  // Changed from close[1] to low[1] for long trailing stop
             lStopActive := true
 
-if strategy.position_size > 0 and lPhase == 2
+if longIsOpen and lPhase == 2
     searchStart    = lSignalBar
     barsFromSearch = bar_index - searchStart
     
     // Use new pivot pattern detector for long exit
-    [pivotFound, pivotExpl] = pivotPatternDetector(pivotLongExitFirst, pivotLongExitSecond, pivotLongExitWinBack, pivotLongExitWinFwd, searchStart)
+    [pivotFound, pivotExpl] = pivotMultiPatternDetector(
+         usePivotLongExitA, pivotLongExitAFirst, pivotLongExitASecond,
+         usePivotLongExitB, pivotLongExitBFirst, pivotLongExitBSecond,
+         usePivotLongExitC, pivotLongExitCFirst, pivotLongExitCSecond,
+         usePivotLongExitD, pivotLongExitDFirst, pivotLongExitDSecond,
+         pivotLongExitWinBack, pivotLongExitWinFwd, searchStart)
     
     if pivotFound
         pivotDetectorResult := "Long Exit: " + pivotExpl
@@ -1282,7 +1409,7 @@ if strategy.position_size > 0 and lPhase == 2
         lPhase   := 0
         lHhFound := false
 
-if lStopActive and strategy.position_size > 0
+if lStopActive and longIsOpen
     // Move stop up only (never down) using low[1]
     if close > close[1]
         lTrailStop := math.max(lTrailStop, low[1])
@@ -1290,7 +1417,17 @@ if lStopActive and strategy.position_size > 0
         profitPct = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0  // Fixed P/L calculation
         lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         strategy.close("Long", comment="Стоп Лонг")
-        longIsOpen := false  // Mark long as closed
+        // Reset all long state variables
+        longIsOpen  := false
+        lStopActive := false
+        lTrailStop  := na
+        lPhase      := 0
+        lHhFound    := false
+        lSignalBar  := na
+        lEntryPrice := na
+        lEntryBar   := na
+        lBuyReason  := ""
+        lSellReason := ""
         if showLabels
             label.new(bar_index, high,
                       "ПРОДАЖА ЛОНГ\n" + lSellReason +
@@ -1299,24 +1436,6 @@ if lStopActive and strategy.position_size > 0
                       "\nP/L: "   + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
                       color=lblColor, textcolor=color.white,
                       style=label.style_label_down, size=size.normal)
-        lStopActive := false
-        lTrailStop  := na
-        lPhase      := 0
-        lBuyReason  := ""    // Reset reason string
-        lSellReason := ""    // Reset reason string
-
-// Сброс при отсутствии лонг-позиции
-if strategy.position_size <= 0
-    longIsOpen  := false
-    lStopActive := false
-    lTrailStop  := na
-    lPhase      := 0
-    lHhFound    := false
-    lSignalBar  := na
-    lEntryPrice := na
-    lEntryBar   := na   // ← СБРОС БАРА ВХОДА
-    lBuyReason  := ""   // Reset reason string
-    lSellReason := ""   // Reset reason string
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ЛОГИКА ШОРТА
@@ -1325,7 +1444,7 @@ if strategy.position_size <= 0
 var string sEntryReason = ""
 sEntrySignal = false
 
-if enableShort and isFirstRedAfterGreen and strategy.position_size == 0
+if enableShort and isFirstRedAfterGreen and not shortIsOpen
     rangeLen = greenCount[1] + 1
     anyMet   = false
 
@@ -1457,11 +1576,17 @@ var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар вх
 var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
 
 if sEntrySignal and not sEntryBlocked and strategy.equity > 0
-    // Проверка пивот-фильтра для входа в шорт (если включён)
+    // Проверка пивот-фильтра для входа в шорт
     pivotEntryOk = true
-    if usePivotFilterShortEntry
+    anyVariantEnabled = usePivotShortEntryA or usePivotShortEntryB or usePivotShortEntryC or usePivotShortEntryD
+    if anyVariantEnabled
         searchFrom = na(sEntryBar) ? bar_index - 50 : sEntryBar  // Fallback для первого входа
-        [pivotFound, pivotExpl] = pivotPatternDetector(pivotShortEntryFirst, pivotShortEntrySecond, pivotShortEntryWinBack, pivotShortEntryWinFwd, searchFrom)
+        [pivotFound, pivotExpl] = pivotMultiPatternDetector(
+             usePivotShortEntryA, pivotShortEntryAFirst, pivotShortEntryASecond,
+             usePivotShortEntryB, pivotShortEntryBFirst, pivotShortEntryBSecond,
+             usePivotShortEntryC, pivotShortEntryCFirst, pivotShortEntryCSecond,
+             usePivotShortEntryD, pivotShortEntryDFirst, pivotShortEntryDSecond,
+             pivotShortEntryWinBack, pivotShortEntryWinFwd, searchFrom)
         if pivotFound
             pivotDetectorResult := "Short Entry: " + pivotExpl
         else
@@ -1474,7 +1599,17 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
             profitPct = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0
             lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
             strategy.close("Long", comment="Закрыт при входе в Шорт (Flip)")
-            longIsOpen := false
+            // Reset all long state variables
+            longIsOpen  := false
+            lStopActive := false
+            lTrailStop  := na
+            lPhase      := 0
+            lHhFound    := false
+            lSignalBar  := na
+            lEntryPrice := na
+            lEntryBar   := na
+            lBuyReason  := ""
+            lSellReason := ""
             if showLabels
                 label.new(bar_index, low,
                           "ЗАКРЫТИЕ ЛОНГ (Flip)\nP/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
@@ -1509,7 +1644,7 @@ var float sPivotRefL   = na
 
 // ── ПРЯМОЕ ЗАКРЫТИЕ ШОРТА SSD1–SSD3 ─────────────────────────────────────
 // ← ЗАЩИТА: проверяем bar_index > sEntryBar — запрещаем закрытие в баре входа
-if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_index > sEntryBar)
+if shortIsOpen and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_index > sEntryBar)
     directCloseMet = false
     directCloseRsn = ""
     if not directCloseMet and enableSSD1
@@ -1539,7 +1674,7 @@ sCloseMet    = false
 sCurCloseRsn = ""
 
 // ← ЗАЩИТА: проверяем bar_index > sEntryBar — запрещаем закрытие в баре входа
-if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_index > sEntryBar)
+if shortIsOpen and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_index > sEntryBar)
     if not sCloseMet and enableSS1
         if checkRange(0, sellWindowBars, rsi, ss1RsiOp, ss1RsiVal) and checkRange(0, sellWindowBars, vfi, ss1VfiOp, ss1VfiVal)
             sCloseMet := true
@@ -1673,7 +1808,8 @@ if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntry
 
     if sCloseMet
         sCloseReason := sCurCloseRsn
-        if usePivotFilterShortExit
+        anyVariantEnabled = usePivotShortExitA or usePivotShortExitB or usePivotShortExitC or usePivotShortExitD
+        if anyVariantEnabled
             sPhase      := 2
             sLlFound    := false
             sPivotRefL  := ta.valuewhen(not na(pl), pl, 0)
@@ -1681,12 +1817,17 @@ if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntry
             sTrailStop  := high[1]  // Changed from close[1] to high[1] for short trailing stop
             sStopActive := true
 
-if strategy.position_size < 0 and sPhase == 2
+if shortIsOpen and sPhase == 2
     searchStart    = sSignalBar
     barsFromSearch = bar_index - searchStart
     
     // Use new pivot pattern detector for short exit
-    [pivotFound, pivotExpl] = pivotPatternDetector(pivotShortExitFirst, pivotShortExitSecond, pivotShortExitWinBack, pivotShortExitWinFwd, searchStart)
+    [pivotFound, pivotExpl] = pivotMultiPatternDetector(
+         usePivotShortExitA, pivotShortExitAFirst, pivotShortExitASecond,
+         usePivotShortExitB, pivotShortExitBFirst, pivotShortExitBSecond,
+         usePivotShortExitC, pivotShortExitCFirst, pivotShortExitCSecond,
+         usePivotShortExitD, pivotShortExitDFirst, pivotShortExitDSecond,
+         pivotShortExitWinBack, pivotShortExitWinFwd, searchStart)
     
     if pivotFound
         pivotDetectorResult := "Short Exit: " + pivotExpl
@@ -1699,7 +1840,7 @@ if strategy.position_size < 0 and sPhase == 2
         sPhase   := 0
         sLlFound := false
 
-if sStopActive and strategy.position_size < 0
+if sStopActive and shortIsOpen
     // Move stop down only (never up) using high[1]
     if close < close[1]
         sTrailStop := math.min(sTrailStop, high[1])
@@ -1707,7 +1848,17 @@ if sStopActive and strategy.position_size < 0
         profitPct = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0  // Fixed P/L calculation
         lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         strategy.close("Short", comment="Стоп Шорт")
-        shortIsOpen := false  // Mark short as closed
+        // Reset all short state variables
+        shortIsOpen := false
+        sStopActive := false
+        sTrailStop  := na
+        sPhase      := 0
+        sLlFound    := false
+        sSignalBar  := na
+        sEntryPrice := na
+        sEntryBar   := na
+        sEntryReason := ""
+        sCloseReason := ""
         if showLabels
             label.new(bar_index, low,
                       "ЗАКРЫТИЕ ШОРТА\n" + sCloseReason +
@@ -1716,24 +1867,6 @@ if sStopActive and strategy.position_size < 0
                       "\nP/L: "   + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
                       color=lblColor, textcolor=color.white,
                       style=label.style_label_up, size=size.normal)
-        sStopActive := false
-        sTrailStop  := na
-        sPhase      := 0
-        sEntryReason := ""     // Reset reason string
-        sCloseReason := ""     // Reset reason string
-
-// Сброс при отсутствии шорт-позиции
-if strategy.position_size >= 0
-    shortIsOpen := false
-    sStopActive := false
-    sTrailStop  := na
-    sPhase      := 0
-    sLlFound    := false
-    sSignalBar  := na
-    sEntryPrice := na
-    sEntryBar   := na   // ← СБРОС БАРА ВХОДА
-    sEntryReason := ""  // Reset reason string
-    sCloseReason := ""  // Reset reason string
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ОТОБРАЖЕНИЕ
