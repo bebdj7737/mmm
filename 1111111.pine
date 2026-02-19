@@ -28,14 +28,10 @@ showTable  = input.bool(true, "Показывать таблицу",  group="О�
 showLabels = input.bool(true, "Показывать метки",     group="Отображение")
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ADX ФИЛЬТР (общий для Лонг и Шорт)
+// ADX CALCULATION (used in entry/exit conditions, not as global filter)
 // ═══════════════════════════════════════════════════════════════════════════
 
-useAdxFilter = input.bool(true,  "Включить DI+ фильтр",           group="ADX Фильтр")
-adxLen       = input.int(14,     "Период ADX/DI",   minval=1,      group="ADX Фильтр")
-adxOp        = input.string("<", "DI+ оператор", options=["<",">"], group="ADX Фильтр")
-adxThresh    = input.float(25.0, "Порог DI+",                      group="ADX Фильтр")
-adxWindow    = input.int(5,      "Окно DI+ (свечей)",  minval=0,   group="ADX Фильтр")
+adxLen = 14  // Fixed period for ADX/DI calculation
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ЧЕТЫРЕ ПИВОТ-ФИЛЬТРА (HH/LH/HL/LL)
@@ -1002,7 +998,6 @@ var string lSellReason = ""
 
 var int   lPhase       = 0
 var int   lSignalBar   = na
-var int   lAdxFoundBar = na
 var bool  lHhFound     = false
 var float lHhVal       = na
 var float lPivotRef    = na
@@ -1173,20 +1168,6 @@ if strategy.position_size > 0 and lPhase == 0 and not lStopActive and (na(lEntry
 
     if lSellMet
         lSellReason := lCurSellRsn
-        if useAdxFilter
-            lPhase := 1
-        else if usePivotFilterLongExit
-            lPhase    := 2
-            lHhFound  := false
-            lPivotRef := ta.valuewhen(not na(ph), ph, 0)
-        else
-            lTrailStop  := low[1]  // Changed from close[1] to low[1] for long trailing stop
-            lStopActive := true
-
-if strategy.position_size > 0 and lPhase == 1
-    barsFromSignal = bar_index - lSignalBar
-    if compare(diPos, adxOp, adxThresh)
-        lAdxFoundBar := bar_index
         if usePivotFilterLongExit
             lPhase    := 2
             lHhFound  := false
@@ -1194,13 +1175,9 @@ if strategy.position_size > 0 and lPhase == 1
         else
             lTrailStop  := low[1]  // Changed from close[1] to low[1] for long trailing stop
             lStopActive := true
-            lPhase      := 0
-    else if barsFromSignal > adxWindow
-        lPhase     := 0
-        lSignalBar := na
 
 if strategy.position_size > 0 and lPhase == 2
-    searchStart    = useAdxFilter ? lAdxFoundBar : lSignalBar
+    searchStart    = lSignalBar
     barsFromSearch = bar_index - searchStart
     
     // Use new pivot pattern detector for long exit
@@ -1425,7 +1402,6 @@ var string sCloseReason = ""
 
 var int   sPhase       = 0
 var int   sSignalBar   = na
-var int   sAdxFoundBar = na
 var bool  sLlFound     = false
 var float sLlVal       = na
 var float sPivotRefL   = na
@@ -1596,9 +1572,7 @@ if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntry
 
     if sCloseMet
         sCloseReason := sCurCloseRsn
-        if useAdxFilter
-            sPhase := 1
-        else if usePivotFilterShortExit
+        if usePivotFilterShortExit
             sPhase      := 2
             sLlFound    := false
             sPivotRefL  := ta.valuewhen(not na(pl), pl, 0)
@@ -1606,25 +1580,8 @@ if strategy.position_size < 0 and sPhase == 0 and not sStopActive and (na(sEntry
             sTrailStop  := high[1]  // Changed from close[1] to high[1] for short trailing stop
             sStopActive := true
 
-sAdxOpMirror = adxOp == "<" ? ">" : "<"
-if strategy.position_size < 0 and sPhase == 1
-    barsFromSignal = bar_index - sSignalBar
-    if compare(diPos, sAdxOpMirror, adxThresh)
-        sAdxFoundBar := bar_index
-        if usePivotFilterShortExit
-            sPhase     := 2
-            sLlFound   := false
-            sPivotRefL := ta.valuewhen(not na(pl), pl, 0)
-        else
-            sTrailStop  := high[1]  // Changed from close[1] to high[1] for short trailing stop
-            sStopActive := true
-            sPhase      := 0
-    else if barsFromSignal > adxWindow
-        sPhase     := 0
-        sSignalBar := na
-
 if strategy.position_size < 0 and sPhase == 2
-    searchStart    = useAdxFilter ? sAdxFoundBar : sSignalBar
+    searchStart    = sSignalBar
     barsFromSearch = bar_index - searchStart
     
     // Use new pivot pattern detector for short exit
