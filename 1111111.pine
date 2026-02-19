@@ -17,12 +17,13 @@ allowFlip   = input.bool(true,  "Разрешить переворот пози�
 // НАСТРОЙКИ ИНДИКАТОРОВ
 // ═══════════════════════════════════════════════════════════════════════════
 
-rsiPeriod      = input.int(14,  "Период RSI",                         minval=1)
-vfiLength      = input.int(130, "Длина VFI",                          minval=1)
-vfiCoef        = input.float(0.2, "Коэффициент VFI")
-vfiVcoef       = input.float(2.5, "Макс. объём VFI")
+rsiPeriod      = 14
+vfiLength      = 130
+vfiCoef        = 0.2
+vfiVcoef       = 2.5
 minRedCandles  = input.int(3,   "Мин. красных свечей перед покупкой (Лонг) / зелёных перед продажей (Шорт)", minval=1)
-sellWindowBars = input.int(3,   "Окно продажи RSI/VFI (свечей назад)", minval=0)
+signalWindowLong  = input.int(5, "Окно сигнала Лонг (свечей назад)",  minval=1, group="Настройки")
+signalWindowShort = input.int(5, "Окно сигнала Шорт (свечей назад)", minval=1, group="Настройки")
 
 showTable  = input.bool(true, "Показывать таблицу",  group="Отображение")
 showLabels = input.bool(true, "Показывать метки",     group="Отображение")
@@ -1014,111 +1015,110 @@ var string lBuyReason  = ""
 lBuySignal = false
 
 if enableLong and isFirstGreenAfterRed and not longIsOpen
-    rangeLen = redCount[1] + 1
     anyMet   = false
 
     if not anyMet and enableLB1
-        if checkRange(0, rangeLen-1, rsi, lb1RsiOp, lb1RsiVal) and checkRange(0, rangeLen-1, vfi, lb1VfiOp, lb1VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb1RsiOp, lb1RsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb1VfiOp, lb1VfiVal)
             anyMet := true
             lBuyReason := "LB1: RSI" + lb1RsiOp + str.tostring(lb1RsiVal) + " VFI" + lb1VfiOp + str.tostring(lb1VfiVal)
     if not anyMet and enableLB2
-        if checkRange(0, rangeLen-1, rsi, lb2RsiOp, lb2RsiVal) and checkRange(0, rangeLen-1, vfi, lb2VfiOp, lb2VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb2RsiOp, lb2RsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb2VfiOp, lb2VfiVal)
             anyMet := true
             lBuyReason := "LB2: RSI" + lb2RsiOp + str.tostring(lb2RsiVal) + " VFI" + lb2VfiOp + str.tostring(lb2VfiVal)
     if not anyMet and enableLB3
-        if checkRange(0, rangeLen-1, rsi, lb3RsiOp, lb3RsiVal) and checkRange(0, rangeLen-1, vfi, lb3VfiOp, lb3VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb3RsiOp, lb3RsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb3VfiOp, lb3VfiVal)
             anyMet := true
             lBuyReason := "LB3: RSI" + lb3RsiOp + str.tostring(lb3RsiVal) + " VFI" + lb3VfiOp + str.tostring(lb3VfiVal)
     if not anyMet and enableLB4
-        if checkRange(0, rangeLen-1, rsi, lb4RsiOp, lb4RsiVal) and checkRange(0, rangeLen-1, vfi, lb4VfiOp, lb4VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb4RsiOp, lb4RsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb4VfiOp, lb4VfiVal)
             anyMet := true
             lBuyReason := "LB4: RSI" + lb4RsiOp + str.tostring(lb4RsiVal) + " VFI" + lb4VfiOp + str.tostring(lb4VfiVal)
     if not anyMet and enableLB5
-        if checkRange(0, rangeLen-1, rsi, lb5RsiOp, lb5RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb5RsiOp, lb5RsiVal)
             anyMet := true
             lBuyReason := "LB5: RSI" + lb5RsiOp + str.tostring(lb5RsiVal)
     if not anyMet and enableLB6
-        if checkRange(0, rangeLen-1, rsi, lb6RsiOp, lb6RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb6RsiOp, lb6RsiVal)
             anyMet := true
             lBuyReason := "LB6: RSI" + lb6RsiOp + str.tostring(lb6RsiVal)
     if not anyMet and enableLB7
-        if checkRange(0, rangeLen-1, rsi, lb7RsiOp, lb7RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb7RsiOp, lb7RsiVal)
             anyMet := true
             lBuyReason := "LB7: RSI" + lb7RsiOp + str.tostring(lb7RsiVal)
     if not anyMet and enableLB8
-        if checkRange(0, rangeLen-1, rsi, lb8RsiOp, lb8RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb8RsiOp, lb8RsiVal)
             anyMet := true
             lBuyReason := "LB8: RSI" + lb8RsiOp + str.tostring(lb8RsiVal)
     if not anyMet and enableLB9
-        if checkRange(0, rangeLen-1, vfi, lb9VfiOp, lb9VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb9VfiOp, lb9VfiVal)
             anyMet := true
             lBuyReason := "LB9: VFI" + lb9VfiOp + str.tostring(lb9VfiVal)
     if not anyMet and enableLB10
-        if checkRange(0, rangeLen-1, vfi, lb10VfiOp, lb10VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb10VfiOp, lb10VfiVal)
             anyMet := true
             lBuyReason := "LB10: VFI" + lb10VfiOp + str.tostring(lb10VfiVal)
     if not anyMet and enableLB11
-        if checkRange(0, rangeLen-1, vfi, lb11VfiOp, lb11VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb11VfiOp, lb11VfiVal)
             anyMet := true
             lBuyReason := "LB11: VFI" + lb11VfiOp + str.tostring(lb11VfiVal)
     if not anyMet and enableLB12
-        if checkRange(0, rangeLen-1, vfi, lb12VfiOp, lb12VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb12VfiOp, lb12VfiVal)
             anyMet := true
             lBuyReason := "LB12: VFI" + lb12VfiOp + str.tostring(lb12VfiVal)
     if not anyMet and enableLB13
-        if checkRange(0, rangeLen-1, diPos, lb13AdxOp, lb13AdxVal)
+        if checkRange(0, signalWindowLong - 1, diPos, lb13AdxOp, lb13AdxVal)
             anyMet := true
             lBuyReason := "LB13a: DI+" + lb13AdxOp + str.tostring(lb13AdxVal)
     if not anyMet and enableLB13b
-        if checkRange(0, rangeLen-1, diPos, lb13bAdxOp, lb13bAdxVal)
+        if checkRange(0, signalWindowLong - 1, diPos, lb13bAdxOp, lb13bAdxVal)
             anyMet := true
             lBuyReason := "LB13b: DI+" + lb13bAdxOp + str.tostring(lb13bAdxVal)
     if not anyMet and enableLB14
-        if checkRange(0, rangeLen-1, rsi, lb14RsiOp, lb14RsiVal) and checkRange(0, rangeLen-1, diPos, lb14AdxOp, lb14AdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb14RsiOp, lb14RsiVal) and checkRange(0, signalWindowLong - 1, diPos, lb14AdxOp, lb14AdxVal)
             anyMet := true
             lBuyReason := "LB14a: RSI" + lb14RsiOp + str.tostring(lb14RsiVal) + " DI+" + lb14AdxOp + str.tostring(lb14AdxVal)
     if not anyMet and enableLB14b
-        if checkRange(0, rangeLen-1, rsi, lb14bRsiOp, lb14bRsiVal) and checkRange(0, rangeLen-1, diPos, lb14bAdxOp, lb14bAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb14bRsiOp, lb14bRsiVal) and checkRange(0, signalWindowLong - 1, diPos, lb14bAdxOp, lb14bAdxVal)
             anyMet := true
             lBuyReason := "LB14b: RSI" + lb14bRsiOp + str.tostring(lb14bRsiVal) + " DI+" + lb14bAdxOp + str.tostring(lb14bAdxVal)
     if not anyMet and enableLB14c
-        if checkRange(0, rangeLen-1, rsi, lb14cRsiOp, lb14cRsiVal) and checkRange(0, rangeLen-1, diPos, lb14cAdxOp, lb14cAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb14cRsiOp, lb14cRsiVal) and checkRange(0, signalWindowLong - 1, diPos, lb14cAdxOp, lb14cAdxVal)
             anyMet := true
             lBuyReason := "LB14c: RSI" + lb14cRsiOp + str.tostring(lb14cRsiVal) + " DI+" + lb14cAdxOp + str.tostring(lb14cAdxVal)
     if not anyMet and enableLB14d
-        if checkRange(0, rangeLen-1, rsi, lb14dRsiOp, lb14dRsiVal) and checkRange(0, rangeLen-1, diPos, lb14dAdxOp, lb14dAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb14dRsiOp, lb14dRsiVal) and checkRange(0, signalWindowLong - 1, diPos, lb14dAdxOp, lb14dAdxVal)
             anyMet := true
             lBuyReason := "LB14d: RSI" + lb14dRsiOp + str.tostring(lb14dRsiVal) + " DI+" + lb14dAdxOp + str.tostring(lb14dAdxVal)
     if not anyMet and enableLB15
-        if checkRange(0, rangeLen-1, vfi, lb15VfiOp, lb15VfiVal) and checkRange(0, rangeLen-1, diPos, lb15AdxOp, lb15AdxVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb15VfiOp, lb15VfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb15AdxOp, lb15AdxVal)
             anyMet := true
             lBuyReason := "LB15a: VFI" + lb15VfiOp + str.tostring(lb15VfiVal) + " DI+" + lb15AdxOp + str.tostring(lb15AdxVal)
     if not anyMet and enableLB15b
-        if checkRange(0, rangeLen-1, vfi, lb15bVfiOp, lb15bVfiVal) and checkRange(0, rangeLen-1, diPos, lb15bAdxOp, lb15bAdxVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb15bVfiOp, lb15bVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb15bAdxOp, lb15bAdxVal)
             anyMet := true
             lBuyReason := "LB15b: VFI" + lb15bVfiOp + str.tostring(lb15bVfiVal) + " DI+" + lb15bAdxOp + str.tostring(lb15bAdxVal)
     if not anyMet and enableLB15c
-        if checkRange(0, rangeLen-1, vfi, lb15cVfiOp, lb15cVfiVal) and checkRange(0, rangeLen-1, diPos, lb15cAdxOp, lb15cAdxVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb15cVfiOp, lb15cVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb15cAdxOp, lb15cAdxVal)
             anyMet := true
             lBuyReason := "LB15c: VFI" + lb15cVfiOp + str.tostring(lb15cVfiVal) + " DI+" + lb15cAdxOp + str.tostring(lb15cAdxVal)
     if not anyMet and enableLB15d
-        if checkRange(0, rangeLen-1, vfi, lb15dVfiOp, lb15dVfiVal) and checkRange(0, rangeLen-1, diPos, lb15dAdxOp, lb15dAdxVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lb15dVfiOp, lb15dVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb15dAdxOp, lb15dAdxVal)
             anyMet := true
             lBuyReason := "LB15d: VFI" + lb15dVfiOp + str.tostring(lb15dVfiVal) + " DI+" + lb15dAdxOp + str.tostring(lb15dAdxVal)
     if not anyMet and enableLB16
-        if checkRange(0, rangeLen-1, rsi, lb16RsiOp, lb16RsiVal) and checkRange(0, rangeLen-1, vfi, lb16VfiOp, lb16VfiVal) and checkRange(0, rangeLen-1, diPos, lb16AdxOp, lb16AdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb16RsiOp, lb16RsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb16VfiOp, lb16VfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb16AdxOp, lb16AdxVal)
             anyMet := true
             lBuyReason := "LB16a: RSI" + lb16RsiOp + str.tostring(lb16RsiVal) + " VFI" + lb16VfiOp + str.tostring(lb16VfiVal) + " DI+" + lb16AdxOp + str.tostring(lb16AdxVal)
     if not anyMet and enableLB16b
-        if checkRange(0, rangeLen-1, rsi, lb16bRsiOp, lb16bRsiVal) and checkRange(0, rangeLen-1, vfi, lb16bVfiOp, lb16bVfiVal) and checkRange(0, rangeLen-1, diPos, lb16bAdxOp, lb16bAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb16bRsiOp, lb16bRsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb16bVfiOp, lb16bVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb16bAdxOp, lb16bAdxVal)
             anyMet := true
             lBuyReason := "LB16b: RSI" + lb16bRsiOp + str.tostring(lb16bRsiVal) + " VFI" + lb16bVfiOp + str.tostring(lb16bVfiVal) + " DI+" + lb16bAdxOp + str.tostring(lb16bAdxVal)
     if not anyMet and enableLB16c
-        if checkRange(0, rangeLen-1, rsi, lb16cRsiOp, lb16cRsiVal) and checkRange(0, rangeLen-1, vfi, lb16cVfiOp, lb16cVfiVal) and checkRange(0, rangeLen-1, diPos, lb16cAdxOp, lb16cAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb16cRsiOp, lb16cRsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb16cVfiOp, lb16cVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb16cAdxOp, lb16cAdxVal)
             anyMet := true
             lBuyReason := "LB16c: RSI" + lb16cRsiOp + str.tostring(lb16cRsiVal) + " VFI" + lb16cVfiOp + str.tostring(lb16cVfiVal) + " DI+" + lb16cAdxOp + str.tostring(lb16cAdxVal)
     if not anyMet and enableLB16d
-        if checkRange(0, rangeLen-1, rsi, lb16dRsiOp, lb16dRsiVal) and checkRange(0, rangeLen-1, vfi, lb16dVfiOp, lb16dVfiVal) and checkRange(0, rangeLen-1, diPos, lb16dAdxOp, lb16dAdxVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lb16dRsiOp, lb16dRsiVal) and checkRange(0, signalWindowLong - 1, vfi, lb16dVfiOp, lb16dVfiVal) and checkRange(0, signalWindowLong - 1, diPos, lb16dAdxOp, lb16dAdxVal)
             anyMet := true
             lBuyReason := "LB16d: RSI" + lb16dRsiOp + str.tostring(lb16dRsiVal) + " VFI" + lb16dVfiOp + str.tostring(lb16dVfiVal) + " DI+" + lb16dAdxOp + str.tostring(lb16dAdxVal)
 
@@ -1141,6 +1141,7 @@ if lBuySignal
             lBuyBlocked := true
 
 var float lEntryPrice = na
+var float lStopPrice  = na
 var int   lEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Лонг
 var bool  longIsOpen  = false  // ← INDEPENDENT TRACKING: Лонг позиция открыта
 
@@ -1191,6 +1192,17 @@ if lBuySignal and not lBuyBlocked and strategy.equity > 0
             longIsOpen := true
             lEntryPrice := close
             lEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
+            // Find most recent LL/HL pivot low for stop
+            lStopPivotLow    = low[1]
+            lStopPivotMaxBar = -1
+            for _pi = 0 to array.size(plBarIndices) - 1
+                _pBar = array.get(plBarIndices, _pi)
+                if _pBar >= bar_index - signalWindowLong * 2 and _pBar <= bar_index
+                    _pType = array.get(plTypes, _pi)
+                    if (_pType == "LL" or _pType == "HL") and _pBar > lStopPivotMaxBar
+                        lStopPivotMaxBar := _pBar
+                        lStopPivotLow    := array.get(plValues, _pi)
+            lStopPrice := lStopPivotLow - syminfo.mintick * 2
             if showLabels
                 label.new(bar_index, low,
                           "ПОКУПКА\n" + lBuyReason + "\nЦена: " + str.tostring(close, "#.##"),
@@ -1217,15 +1229,15 @@ if longIsOpen and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_inde
     directSellMet = false
     directSellRsn = ""
     if not directSellMet and enableLSD1
-        if checkRange(0, sellWindowBars, rsi, lsd1RsiOp, lsd1RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, lsd1RsiOp, lsd1RsiVal)
             directSellMet := true
             directSellRsn := "LSD1: RSI" + lsd1RsiOp + str.tostring(lsd1RsiVal)
     if not directSellMet and enableLSD2
-        if checkRange(0, sellWindowBars, vfi, lsd2VfiOp, lsd2VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, lsd2VfiOp, lsd2VfiVal)
             directSellMet := true
             directSellRsn := "LSD2: VFI" + lsd2VfiOp + str.tostring(lsd2VfiVal)
     if not directSellMet and enableLSD3
-        if checkRange(0, sellWindowBars, diPos, lsd3DiOp, lsd3DiVal)
+        if checkRange(0, signalWindowLong - 1, diPos, lsd3DiOp, lsd3DiVal)
             directSellMet := true
             directSellRsn := "LSD3: DI+" + lsd3DiOp + str.tostring(lsd3DiVal)
     if directSellMet
@@ -1245,132 +1257,132 @@ lCurSellRsn = ""
 // ← ЗАЩИТА: проверяем bar_index > lEntryBar — запрещаем продажу в баре входа
 if longIsOpen and lPhase == 0 and not lStopActive and (na(lEntryBar) or bar_index > lEntryBar)
     if not lSellMet and enableLS1
-        if checkRange(0, sellWindowBars, rsi, ls1RsiOp, ls1RsiVal) and checkRange(0, sellWindowBars, vfi, ls1VfiOp, ls1VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls1RsiOp, ls1RsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls1VfiOp, ls1VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS1: RSI" + ls1RsiOp + str.tostring(ls1RsiVal) + " VFI" + ls1VfiOp + str.tostring(ls1VfiVal)
     if not lSellMet and enableLS2
-        if checkRange(0, sellWindowBars, rsi, ls2RsiOp, ls2RsiVal) and checkRange(0, sellWindowBars, vfi, ls2VfiOp, ls2VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls2RsiOp, ls2RsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls2VfiOp, ls2VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS2: RSI" + ls2RsiOp + str.tostring(ls2RsiVal) + " VFI" + ls2VfiOp + str.tostring(ls2VfiVal)
     if not lSellMet and enableLS3
-        if checkRange(0, sellWindowBars, rsi, ls3RsiOp, ls3RsiVal) and checkRange(0, sellWindowBars, vfi, ls3VfiOp, ls3VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls3RsiOp, ls3RsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls3VfiOp, ls3VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS3: RSI" + ls3RsiOp + str.tostring(ls3RsiVal) + " VFI" + ls3VfiOp + str.tostring(ls3VfiVal)
     if not lSellMet and enableLS4
-        if checkRange(0, sellWindowBars, rsi, ls4RsiOp, ls4RsiVal) and checkRange(0, sellWindowBars, vfi, ls4VfiOp, ls4VfiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls4RsiOp, ls4RsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls4VfiOp, ls4VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS4: RSI" + ls4RsiOp + str.tostring(ls4RsiVal) + " VFI" + ls4VfiOp + str.tostring(ls4VfiVal)
     if not lSellMet and enableLS5
-        if checkRange(0, sellWindowBars, rsi, ls5RsiOp, ls5RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls5RsiOp, ls5RsiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS5: RSI" + ls5RsiOp + str.tostring(ls5RsiVal)
     if not lSellMet and enableLS6
-        if checkRange(0, sellWindowBars, rsi, ls6RsiOp, ls6RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls6RsiOp, ls6RsiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS6: RSI" + ls6RsiOp + str.tostring(ls6RsiVal)
     if not lSellMet and enableLS7
-        if checkRange(0, sellWindowBars, rsi, ls7RsiOp, ls7RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls7RsiOp, ls7RsiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS7: RSI" + ls7RsiOp + str.tostring(ls7RsiVal)
     if not lSellMet and enableLS8
-        if checkRange(0, sellWindowBars, rsi, ls8RsiOp, ls8RsiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls8RsiOp, ls8RsiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS8: RSI" + ls8RsiOp + str.tostring(ls8RsiVal)
     if not lSellMet and enableLS9
-        if checkRange(0, sellWindowBars, vfi, ls9VfiOp, ls9VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls9VfiOp, ls9VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS9: VFI" + ls9VfiOp + str.tostring(ls9VfiVal)
     if not lSellMet and enableLS10
-        if checkRange(0, sellWindowBars, vfi, ls10VfiOp, ls10VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls10VfiOp, ls10VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS10: VFI" + ls10VfiOp + str.tostring(ls10VfiVal)
     if not lSellMet and enableLS11
-        if checkRange(0, sellWindowBars, vfi, ls11VfiOp, ls11VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls11VfiOp, ls11VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS11: VFI" + ls11VfiOp + str.tostring(ls11VfiVal)
     if not lSellMet and enableLS12
-        if checkRange(0, sellWindowBars, vfi, ls12VfiOp, ls12VfiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls12VfiOp, ls12VfiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS12: VFI" + ls12VfiOp + str.tostring(ls12VfiVal)
     if not lSellMet and enableLS13
-        if checkRange(0, sellWindowBars, diPos, ls13DiOp, ls13DiVal)
+        if checkRange(0, signalWindowLong - 1, diPos, ls13DiOp, ls13DiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS13a: DI+" + ls13DiOp + str.tostring(ls13DiVal)
     if not lSellMet and enableLS13b
-        if checkRange(0, sellWindowBars, diPos, ls13bDiOp, ls13bDiVal)
+        if checkRange(0, signalWindowLong - 1, diPos, ls13bDiOp, ls13bDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS13b: DI+" + ls13bDiOp + str.tostring(ls13bDiVal)
     if not lSellMet and enableLS14
-        if checkRange(0, sellWindowBars, rsi, ls14RsiOp, ls14RsiVal) and checkRange(0, sellWindowBars, diPos, ls14DiOp, ls14DiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls14RsiOp, ls14RsiVal) and checkRange(0, signalWindowLong - 1, diPos, ls14DiOp, ls14DiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS14a: RSI" + ls14RsiOp + str.tostring(ls14RsiVal) + " DI+" + ls14DiOp + str.tostring(ls14DiVal)
     if not lSellMet and enableLS14b
-        if checkRange(0, sellWindowBars, rsi, ls14bRsiOp, ls14bRsiVal) and checkRange(0, sellWindowBars, diPos, ls14bDiOp, ls14bDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls14bRsiOp, ls14bRsiVal) and checkRange(0, signalWindowLong - 1, diPos, ls14bDiOp, ls14bDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS14b: RSI" + ls14bRsiOp + str.tostring(ls14bRsiVal) + " DI+" + ls14bDiOp + str.tostring(ls14bDiVal)
     if not lSellMet and enableLS14c
-        if checkRange(0, sellWindowBars, rsi, ls14cRsiOp, ls14cRsiVal) and checkRange(0, sellWindowBars, diPos, ls14cDiOp, ls14cDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls14cRsiOp, ls14cRsiVal) and checkRange(0, signalWindowLong - 1, diPos, ls14cDiOp, ls14cDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS14c: RSI" + ls14cRsiOp + str.tostring(ls14cRsiVal) + " DI+" + ls14cDiOp + str.tostring(ls14cDiVal)
     if not lSellMet and enableLS14d
-        if checkRange(0, sellWindowBars, rsi, ls14dRsiOp, ls14dRsiVal) and checkRange(0, sellWindowBars, diPos, ls14dDiOp, ls14dDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls14dRsiOp, ls14dRsiVal) and checkRange(0, signalWindowLong - 1, diPos, ls14dDiOp, ls14dDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS14d: RSI" + ls14dRsiOp + str.tostring(ls14dRsiVal) + " DI+" + ls14dDiOp + str.tostring(ls14dDiVal)
     if not lSellMet and enableLS15
-        if checkRange(0, sellWindowBars, vfi, ls15VfiOp, ls15VfiVal) and checkRange(0, sellWindowBars, diPos, ls15DiOp, ls15DiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls15VfiOp, ls15VfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls15DiOp, ls15DiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS15a: VFI" + ls15VfiOp + str.tostring(ls15VfiVal) + " DI+" + ls15DiOp + str.tostring(ls15DiVal)
     if not lSellMet and enableLS15b
-        if checkRange(0, sellWindowBars, vfi, ls15bVfiOp, ls15bVfiVal) and checkRange(0, sellWindowBars, diPos, ls15bDiOp, ls15bDiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls15bVfiOp, ls15bVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls15bDiOp, ls15bDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS15b: VFI" + ls15bVfiOp + str.tostring(ls15bVfiVal) + " DI+" + ls15bDiOp + str.tostring(ls15bDiVal)
     if not lSellMet and enableLS15c
-        if checkRange(0, sellWindowBars, vfi, ls15cVfiOp, ls15cVfiVal) and checkRange(0, sellWindowBars, diPos, ls15cDiOp, ls15cDiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls15cVfiOp, ls15cVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls15cDiOp, ls15cDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS15c: VFI" + ls15cVfiOp + str.tostring(ls15cVfiVal) + " DI+" + ls15cDiOp + str.tostring(ls15cDiVal)
     if not lSellMet and enableLS15d
-        if checkRange(0, sellWindowBars, vfi, ls15dVfiOp, ls15dVfiVal) and checkRange(0, sellWindowBars, diPos, ls15dDiOp, ls15dDiVal)
+        if checkRange(0, signalWindowLong - 1, vfi, ls15dVfiOp, ls15dVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls15dDiOp, ls15dDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS15d: VFI" + ls15dVfiOp + str.tostring(ls15dVfiVal) + " DI+" + ls15dDiOp + str.tostring(ls15dDiVal)
     if not lSellMet and enableLS16
-        if checkRange(0, sellWindowBars, rsi, ls16RsiOp, ls16RsiVal) and checkRange(0, sellWindowBars, vfi, ls16VfiOp, ls16VfiVal) and checkRange(0, sellWindowBars, diPos, ls16DiOp, ls16DiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls16RsiOp, ls16RsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls16VfiOp, ls16VfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls16DiOp, ls16DiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS16a: RSI" + ls16RsiOp + str.tostring(ls16RsiVal) + " VFI" + ls16VfiOp + str.tostring(ls16VfiVal) + " DI+" + ls16DiOp + str.tostring(ls16DiVal)
     if not lSellMet and enableLS16b
-        if checkRange(0, sellWindowBars, rsi, ls16bRsiOp, ls16bRsiVal) and checkRange(0, sellWindowBars, vfi, ls16bVfiOp, ls16bVfiVal) and checkRange(0, sellWindowBars, diPos, ls16bDiOp, ls16bDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls16bRsiOp, ls16bRsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls16bVfiOp, ls16bVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls16bDiOp, ls16bDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS16b: RSI" + ls16bRsiOp + str.tostring(ls16bRsiVal) + " VFI" + ls16bVfiOp + str.tostring(ls16bVfiVal) + " DI+" + ls16bDiOp + str.tostring(ls16bDiVal)
     if not lSellMet and enableLS16c
-        if checkRange(0, sellWindowBars, rsi, ls16cRsiOp, ls16cRsiVal) and checkRange(0, sellWindowBars, vfi, ls16cVfiOp, ls16cVfiVal) and checkRange(0, sellWindowBars, diPos, ls16cDiOp, ls16cDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls16cRsiOp, ls16cRsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls16cVfiOp, ls16cVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls16cDiOp, ls16cDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS16c: RSI" + ls16cRsiOp + str.tostring(ls16cRsiVal) + " VFI" + ls16cVfiOp + str.tostring(ls16cVfiVal) + " DI+" + ls16cDiOp + str.tostring(ls16cDiVal)
     if not lSellMet and enableLS16d
-        if checkRange(0, sellWindowBars, rsi, ls16dRsiOp, ls16dRsiVal) and checkRange(0, sellWindowBars, vfi, ls16dVfiOp, ls16dVfiVal) and checkRange(0, sellWindowBars, diPos, ls16dDiOp, ls16dDiVal)
+        if checkRange(0, signalWindowLong - 1, rsi, ls16dRsiOp, ls16dRsiVal) and checkRange(0, signalWindowLong - 1, vfi, ls16dVfiOp, ls16dVfiVal) and checkRange(0, signalWindowLong - 1, diPos, ls16dDiOp, ls16dDiVal)
             lSellMet := true
             lSignalBar := bar_index
             lCurSellRsn := "LS16d: RSI" + ls16dRsiOp + str.tostring(ls16dRsiVal) + " VFI" + ls16dVfiOp + str.tostring(ls16dVfiVal) + " DI+" + ls16dDiOp + str.tostring(ls16dDiVal)
@@ -1409,18 +1421,25 @@ if longIsOpen and lPhase == 2
         lPhase   := 0
         lHhFound := false
 
+if longIsOpen and not na(lStopPrice)
+    strategy.exit("Long Stop", from_entry="Long", stop=lStopPrice, comment="Стоп Лонг")
+
 if lStopActive and longIsOpen
     // Move stop up only (never down) using low[1]
     if close > close[1]
         lTrailStop := math.max(lTrailStop, low[1])
-    if close < lTrailStop
-        profitPct = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0  // Fixed P/L calculation
-        lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
-        strategy.close("Long", comment="Стоп Лонг")
+        lStopPrice := lTrailStop
+    if close < lStopPrice
+        profitPct  = (not na(lEntryPrice) and lEntryPrice > 0) ? ((close - lEntryPrice) / lEntryPrice * 100) : 0.0
+        plStr      = "P/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%"
+        entryStr   = str.tostring(lEntryPrice, "#.##")
+        sellRsnStr = lSellReason
+        lblColor   = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         // Reset all long state variables
         longIsOpen  := false
         lStopActive := false
         lTrailStop  := na
+        lStopPrice  := na
         lPhase      := 0
         lHhFound    := false
         lSignalBar  := na
@@ -1430,10 +1449,10 @@ if lStopActive and longIsOpen
         lSellReason := ""
         if showLabels
             label.new(bar_index, high,
-                      "ПРОДАЖА ЛОНГ\n" + lSellReason +
+                      "ПРОДАЖА ЛОНГ\n" + sellRsnStr +
                       "\nЦена: "  + str.tostring(close, "#.##") +
-                      "\nВход: "  + str.tostring(lEntryPrice, "#.##") +
-                      "\nP/L: "   + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
+                      "\nВход: "  + entryStr +
+                      "\n" + plStr,
                       color=lblColor, textcolor=color.white,
                       style=label.style_label_down, size=size.normal)
 
@@ -1445,111 +1464,110 @@ var string sEntryReason = ""
 sEntrySignal = false
 
 if enableShort and isFirstRedAfterGreen and not shortIsOpen
-    rangeLen = greenCount[1] + 1
     anyMet   = false
 
     if not anyMet and enableSB1
-        if checkRange(0, rangeLen-1, rsi, sb1RsiOp, sb1RsiVal) and checkRange(0, rangeLen-1, vfi, sb1VfiOp, sb1VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb1RsiOp, sb1RsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb1VfiOp, sb1VfiVal)
             anyMet := true
             sEntryReason := "SB1: RSI" + sb1RsiOp + str.tostring(sb1RsiVal) + " VFI" + sb1VfiOp + str.tostring(sb1VfiVal)
     if not anyMet and enableSB2
-        if checkRange(0, rangeLen-1, rsi, sb2RsiOp, sb2RsiVal) and checkRange(0, rangeLen-1, vfi, sb2VfiOp, sb2VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb2RsiOp, sb2RsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb2VfiOp, sb2VfiVal)
             anyMet := true
             sEntryReason := "SB2: RSI" + sb2RsiOp + str.tostring(sb2RsiVal) + " VFI" + sb2VfiOp + str.tostring(sb2VfiVal)
     if not anyMet and enableSB3
-        if checkRange(0, rangeLen-1, rsi, sb3RsiOp, sb3RsiVal) and checkRange(0, rangeLen-1, vfi, sb3VfiOp, sb3VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb3RsiOp, sb3RsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb3VfiOp, sb3VfiVal)
             anyMet := true
             sEntryReason := "SB3: RSI" + sb3RsiOp + str.tostring(sb3RsiVal) + " VFI" + sb3VfiOp + str.tostring(sb3VfiVal)
     if not anyMet and enableSB4
-        if checkRange(0, rangeLen-1, rsi, sb4RsiOp, sb4RsiVal) and checkRange(0, rangeLen-1, vfi, sb4VfiOp, sb4VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb4RsiOp, sb4RsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb4VfiOp, sb4VfiVal)
             anyMet := true
             sEntryReason := "SB4: RSI" + sb4RsiOp + str.tostring(sb4RsiVal) + " VFI" + sb4VfiOp + str.tostring(sb4VfiVal)
     if not anyMet and enableSB5
-        if checkRange(0, rangeLen-1, rsi, sb5RsiOp, sb5RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb5RsiOp, sb5RsiVal)
             anyMet := true
             sEntryReason := "SB5: RSI" + sb5RsiOp + str.tostring(sb5RsiVal)
     if not anyMet and enableSB6
-        if checkRange(0, rangeLen-1, rsi, sb6RsiOp, sb6RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb6RsiOp, sb6RsiVal)
             anyMet := true
             sEntryReason := "SB6: RSI" + sb6RsiOp + str.tostring(sb6RsiVal)
     if not anyMet and enableSB7
-        if checkRange(0, rangeLen-1, rsi, sb7RsiOp, sb7RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb7RsiOp, sb7RsiVal)
             anyMet := true
             sEntryReason := "SB7: RSI" + sb7RsiOp + str.tostring(sb7RsiVal)
     if not anyMet and enableSB8
-        if checkRange(0, rangeLen-1, rsi, sb8RsiOp, sb8RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb8RsiOp, sb8RsiVal)
             anyMet := true
             sEntryReason := "SB8: RSI" + sb8RsiOp + str.tostring(sb8RsiVal)
     if not anyMet and enableSB9
-        if checkRange(0, rangeLen-1, vfi, sb9VfiOp, sb9VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb9VfiOp, sb9VfiVal)
             anyMet := true
             sEntryReason := "SB9: VFI" + sb9VfiOp + str.tostring(sb9VfiVal)
     if not anyMet and enableSB10
-        if checkRange(0, rangeLen-1, vfi, sb10VfiOp, sb10VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb10VfiOp, sb10VfiVal)
             anyMet := true
             sEntryReason := "SB10: VFI" + sb10VfiOp + str.tostring(sb10VfiVal)
     if not anyMet and enableSB11
-        if checkRange(0, rangeLen-1, vfi, sb11VfiOp, sb11VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb11VfiOp, sb11VfiVal)
             anyMet := true
             sEntryReason := "SB11: VFI" + sb11VfiOp + str.tostring(sb11VfiVal)
     if not anyMet and enableSB12
-        if checkRange(0, rangeLen-1, vfi, sb12VfiOp, sb12VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb12VfiOp, sb12VfiVal)
             anyMet := true
             sEntryReason := "SB12: VFI" + sb12VfiOp + str.tostring(sb12VfiVal)
     if not anyMet and enableSB13
-        if checkRange(0, rangeLen-1, diPos, sb13AdxOp, sb13AdxVal)
+        if checkRange(0, signalWindowShort - 1, diPos, sb13AdxOp, sb13AdxVal)
             anyMet := true
             sEntryReason := "SB13a: DI+" + sb13AdxOp + str.tostring(sb13AdxVal)
     if not anyMet and enableSB13b
-        if checkRange(0, rangeLen-1, diPos, sb13bAdxOp, sb13bAdxVal)
+        if checkRange(0, signalWindowShort - 1, diPos, sb13bAdxOp, sb13bAdxVal)
             anyMet := true
             sEntryReason := "SB13b: DI+" + sb13bAdxOp + str.tostring(sb13bAdxVal)
     if not anyMet and enableSB14
-        if checkRange(0, rangeLen-1, rsi, sb14RsiOp, sb14RsiVal) and checkRange(0, rangeLen-1, diPos, sb14AdxOp, sb14AdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb14RsiOp, sb14RsiVal) and checkRange(0, signalWindowShort - 1, diPos, sb14AdxOp, sb14AdxVal)
             anyMet := true
             sEntryReason := "SB14a: RSI" + sb14RsiOp + str.tostring(sb14RsiVal) + " DI+" + sb14AdxOp + str.tostring(sb14AdxVal)
     if not anyMet and enableSB14b
-        if checkRange(0, rangeLen-1, rsi, sb14bRsiOp, sb14bRsiVal) and checkRange(0, rangeLen-1, diPos, sb14bAdxOp, sb14bAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb14bRsiOp, sb14bRsiVal) and checkRange(0, signalWindowShort - 1, diPos, sb14bAdxOp, sb14bAdxVal)
             anyMet := true
             sEntryReason := "SB14b: RSI" + sb14bRsiOp + str.tostring(sb14bRsiVal) + " DI+" + sb14bAdxOp + str.tostring(sb14bAdxVal)
     if not anyMet and enableSB14c
-        if checkRange(0, rangeLen-1, rsi, sb14cRsiOp, sb14cRsiVal) and checkRange(0, rangeLen-1, diPos, sb14cAdxOp, sb14cAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb14cRsiOp, sb14cRsiVal) and checkRange(0, signalWindowShort - 1, diPos, sb14cAdxOp, sb14cAdxVal)
             anyMet := true
             sEntryReason := "SB14c: RSI" + sb14cRsiOp + str.tostring(sb14cRsiVal) + " DI+" + sb14cAdxOp + str.tostring(sb14cAdxVal)
     if not anyMet and enableSB14d
-        if checkRange(0, rangeLen-1, rsi, sb14dRsiOp, sb14dRsiVal) and checkRange(0, rangeLen-1, diPos, sb14dAdxOp, sb14dAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb14dRsiOp, sb14dRsiVal) and checkRange(0, signalWindowShort - 1, diPos, sb14dAdxOp, sb14dAdxVal)
             anyMet := true
             sEntryReason := "SB14d: RSI" + sb14dRsiOp + str.tostring(sb14dRsiVal) + " DI+" + sb14dAdxOp + str.tostring(sb14dAdxVal)
     if not anyMet and enableSB15
-        if checkRange(0, rangeLen-1, vfi, sb15VfiOp, sb15VfiVal) and checkRange(0, rangeLen-1, diPos, sb15AdxOp, sb15AdxVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb15VfiOp, sb15VfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb15AdxOp, sb15AdxVal)
             anyMet := true
             sEntryReason := "SB15a: VFI" + sb15VfiOp + str.tostring(sb15VfiVal) + " DI+" + sb15AdxOp + str.tostring(sb15AdxVal)
     if not anyMet and enableSB15b
-        if checkRange(0, rangeLen-1, vfi, sb15bVfiOp, sb15bVfiVal) and checkRange(0, rangeLen-1, diPos, sb15bAdxOp, sb15bAdxVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb15bVfiOp, sb15bVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb15bAdxOp, sb15bAdxVal)
             anyMet := true
             sEntryReason := "SB15b: VFI" + sb15bVfiOp + str.tostring(sb15bVfiVal) + " DI+" + sb15bAdxOp + str.tostring(sb15bAdxVal)
     if not anyMet and enableSB15c
-        if checkRange(0, rangeLen-1, vfi, sb15cVfiOp, sb15cVfiVal) and checkRange(0, rangeLen-1, diPos, sb15cAdxOp, sb15cAdxVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb15cVfiOp, sb15cVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb15cAdxOp, sb15cAdxVal)
             anyMet := true
             sEntryReason := "SB15c: VFI" + sb15cVfiOp + str.tostring(sb15cVfiVal) + " DI+" + sb15cAdxOp + str.tostring(sb15cAdxVal)
     if not anyMet and enableSB15d
-        if checkRange(0, rangeLen-1, vfi, sb15dVfiOp, sb15dVfiVal) and checkRange(0, rangeLen-1, diPos, sb15dAdxOp, sb15dAdxVal)
+        if checkRange(0, signalWindowShort - 1, vfi, sb15dVfiOp, sb15dVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb15dAdxOp, sb15dAdxVal)
             anyMet := true
             sEntryReason := "SB15d: VFI" + sb15dVfiOp + str.tostring(sb15dVfiVal) + " DI+" + sb15dAdxOp + str.tostring(sb15dAdxVal)
     if not anyMet and enableSB16
-        if checkRange(0, rangeLen-1, rsi, sb16RsiOp, sb16RsiVal) and checkRange(0, rangeLen-1, vfi, sb16VfiOp, sb16VfiVal) and checkRange(0, rangeLen-1, diPos, sb16AdxOp, sb16AdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb16RsiOp, sb16RsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb16VfiOp, sb16VfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb16AdxOp, sb16AdxVal)
             anyMet := true
             sEntryReason := "SB16a: RSI" + sb16RsiOp + str.tostring(sb16RsiVal) + " VFI" + sb16VfiOp + str.tostring(sb16VfiVal) + " DI+" + sb16AdxOp + str.tostring(sb16AdxVal)
     if not anyMet and enableSB16b
-        if checkRange(0, rangeLen-1, rsi, sb16bRsiOp, sb16bRsiVal) and checkRange(0, rangeLen-1, vfi, sb16bVfiOp, sb16bVfiVal) and checkRange(0, rangeLen-1, diPos, sb16bAdxOp, sb16bAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb16bRsiOp, sb16bRsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb16bVfiOp, sb16bVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb16bAdxOp, sb16bAdxVal)
             anyMet := true
             sEntryReason := "SB16b: RSI" + sb16bRsiOp + str.tostring(sb16bRsiVal) + " VFI" + sb16bVfiOp + str.tostring(sb16bVfiVal) + " DI+" + sb16bAdxOp + str.tostring(sb16bAdxVal)
     if not anyMet and enableSB16c
-        if checkRange(0, rangeLen-1, rsi, sb16cRsiOp, sb16cRsiVal) and checkRange(0, rangeLen-1, vfi, sb16cVfiOp, sb16cVfiVal) and checkRange(0, rangeLen-1, diPos, sb16cAdxOp, sb16cAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb16cRsiOp, sb16cRsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb16cVfiOp, sb16cVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb16cAdxOp, sb16cAdxVal)
             anyMet := true
             sEntryReason := "SB16c: RSI" + sb16cRsiOp + str.tostring(sb16cRsiVal) + " VFI" + sb16cVfiOp + str.tostring(sb16cVfiVal) + " DI+" + sb16cAdxOp + str.tostring(sb16cAdxVal)
     if not anyMet and enableSB16d
-        if checkRange(0, rangeLen-1, rsi, sb16dRsiOp, sb16dRsiVal) and checkRange(0, rangeLen-1, vfi, sb16dVfiOp, sb16dVfiVal) and checkRange(0, rangeLen-1, diPos, sb16dAdxOp, sb16dAdxVal)
+        if checkRange(0, signalWindowShort - 1, rsi, sb16dRsiOp, sb16dRsiVal) and checkRange(0, signalWindowShort - 1, vfi, sb16dVfiOp, sb16dVfiVal) and checkRange(0, signalWindowShort - 1, diPos, sb16dAdxOp, sb16dAdxVal)
             anyMet := true
             sEntryReason := "SB16d: RSI" + sb16dRsiOp + str.tostring(sb16dRsiVal) + " VFI" + sb16dVfiOp + str.tostring(sb16dVfiVal) + " DI+" + sb16dAdxOp + str.tostring(sb16dAdxVal)
 
@@ -1572,6 +1590,7 @@ if sEntrySignal
             sEntryBlocked := true
 
 var float sEntryPrice = na
+var float sStopPrice  = na
 var int   sEntryBar   = na   // ← НОВАЯ ПЕРЕМЕННАЯ: бар входа в Шорт
 var bool  shortIsOpen = false  // ← INDEPENDENT TRACKING: Шорт позиция открыта
 
@@ -1622,6 +1641,17 @@ if sEntrySignal and not sEntryBlocked and strategy.equity > 0
             shortIsOpen := true
             sEntryPrice := close
             sEntryBar   := bar_index   // ← ЗАПОМИНАЕМ БАР ВХОДА
+            // Find most recent HH/LH pivot high for stop
+            sStopPivotHigh    = high[1]
+            sStopPivotMaxBar  = -1
+            for _pi = 0 to array.size(phBarIndices) - 1
+                _pBar = array.get(phBarIndices, _pi)
+                if _pBar >= bar_index - signalWindowShort * 2 and _pBar <= bar_index
+                    _pType = array.get(phTypes, _pi)
+                    if (_pType == "HH" or _pType == "LH") and _pBar > sStopPivotMaxBar
+                        sStopPivotMaxBar  := _pBar
+                        sStopPivotHigh    := array.get(phValues, _pi)
+            sStopPrice := sStopPivotHigh + syminfo.mintick * 2
             if showLabels
                 label.new(bar_index, high,
                           "ШОРТ\n" + sEntryReason + "\nЦена: " + str.tostring(close, "#.##"),
@@ -1648,15 +1678,15 @@ if shortIsOpen and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_ind
     directCloseMet = false
     directCloseRsn = ""
     if not directCloseMet and enableSSD1
-        if checkRange(0, sellWindowBars, rsi, ssd1RsiOp, ssd1RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ssd1RsiOp, ssd1RsiVal)
             directCloseMet := true
             directCloseRsn := "SSD1: RSI" + ssd1RsiOp + str.tostring(ssd1RsiVal)
     if not directCloseMet and enableSSD2
-        if checkRange(0, sellWindowBars, vfi, ssd2VfiOp, ssd2VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ssd2VfiOp, ssd2VfiVal)
             directCloseMet := true
             directCloseRsn := "SSD2: VFI" + ssd2VfiOp + str.tostring(ssd2VfiVal)
     if not directCloseMet and enableSSD3
-        if checkRange(0, sellWindowBars, diPos, ssd3DiOp, ssd3DiVal)
+        if checkRange(0, signalWindowShort - 1, diPos, ssd3DiOp, ssd3DiVal)
             directCloseMet := true
             directCloseRsn := "SSD3: DI+" + ssd3DiOp + str.tostring(ssd3DiVal)
     if directCloseMet
@@ -1676,132 +1706,132 @@ sCurCloseRsn = ""
 // ← ЗАЩИТА: проверяем bar_index > sEntryBar — запрещаем закрытие в баре входа
 if shortIsOpen and sPhase == 0 and not sStopActive and (na(sEntryBar) or bar_index > sEntryBar)
     if not sCloseMet and enableSS1
-        if checkRange(0, sellWindowBars, rsi, ss1RsiOp, ss1RsiVal) and checkRange(0, sellWindowBars, vfi, ss1VfiOp, ss1VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss1RsiOp, ss1RsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss1VfiOp, ss1VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS1: RSI" + ss1RsiOp + str.tostring(ss1RsiVal) + " VFI" + ss1VfiOp + str.tostring(ss1VfiVal)
     if not sCloseMet and enableSS2
-        if checkRange(0, sellWindowBars, rsi, ss2RsiOp, ss2RsiVal) and checkRange(0, sellWindowBars, vfi, ss2VfiOp, ss2VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss2RsiOp, ss2RsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss2VfiOp, ss2VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS2: RSI" + ss2RsiOp + str.tostring(ss2RsiVal) + " VFI" + ss2VfiOp + str.tostring(ss2VfiVal)
     if not sCloseMet and enableSS3
-        if checkRange(0, sellWindowBars, rsi, ss3RsiOp, ss3RsiVal) and checkRange(0, sellWindowBars, vfi, ss3VfiOp, ss3VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss3RsiOp, ss3RsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss3VfiOp, ss3VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS3: RSI" + ss3RsiOp + str.tostring(ss3RsiVal) + " VFI" + ss3VfiOp + str.tostring(ss3VfiVal)
     if not sCloseMet and enableSS4
-        if checkRange(0, sellWindowBars, rsi, ss4RsiOp, ss4RsiVal) and checkRange(0, sellWindowBars, vfi, ss4VfiOp, ss4VfiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss4RsiOp, ss4RsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss4VfiOp, ss4VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS4: RSI" + ss4RsiOp + str.tostring(ss4RsiVal) + " VFI" + ss4VfiOp + str.tostring(ss4VfiVal)
     if not sCloseMet and enableSS5
-        if checkRange(0, sellWindowBars, rsi, ss5RsiOp, ss5RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss5RsiOp, ss5RsiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS5: RSI" + ss5RsiOp + str.tostring(ss5RsiVal)
     if not sCloseMet and enableSS6
-        if checkRange(0, sellWindowBars, rsi, ss6RsiOp, ss6RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss6RsiOp, ss6RsiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS6: RSI" + ss6RsiOp + str.tostring(ss6RsiVal)
     if not sCloseMet and enableSS7
-        if checkRange(0, sellWindowBars, rsi, ss7RsiOp, ss7RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss7RsiOp, ss7RsiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS7: RSI" + ss7RsiOp + str.tostring(ss7RsiVal)
     if not sCloseMet and enableSS8
-        if checkRange(0, sellWindowBars, rsi, ss8RsiOp, ss8RsiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss8RsiOp, ss8RsiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS8: RSI" + ss8RsiOp + str.tostring(ss8RsiVal)
     if not sCloseMet and enableSS9
-        if checkRange(0, sellWindowBars, vfi, ss9VfiOp, ss9VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss9VfiOp, ss9VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS9: VFI" + ss9VfiOp + str.tostring(ss9VfiVal)
     if not sCloseMet and enableSS10
-        if checkRange(0, sellWindowBars, vfi, ss10VfiOp, ss10VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss10VfiOp, ss10VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS10: VFI" + ss10VfiOp + str.tostring(ss10VfiVal)
     if not sCloseMet and enableSS11
-        if checkRange(0, sellWindowBars, vfi, ss11VfiOp, ss11VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss11VfiOp, ss11VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS11: VFI" + ss11VfiOp + str.tostring(ss11VfiVal)
     if not sCloseMet and enableSS12
-        if checkRange(0, sellWindowBars, vfi, ss12VfiOp, ss12VfiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss12VfiOp, ss12VfiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS12: VFI" + ss12VfiOp + str.tostring(ss12VfiVal)
     if not sCloseMet and enableSS13
-        if checkRange(0, sellWindowBars, diPos, ss13DiOp, ss13DiVal)
+        if checkRange(0, signalWindowShort - 1, diPos, ss13DiOp, ss13DiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS13a: DI+" + ss13DiOp + str.tostring(ss13DiVal)
     if not sCloseMet and enableSS13b
-        if checkRange(0, sellWindowBars, diPos, ss13bDiOp, ss13bDiVal)
+        if checkRange(0, signalWindowShort - 1, diPos, ss13bDiOp, ss13bDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS13b: DI+" + ss13bDiOp + str.tostring(ss13bDiVal)
     if not sCloseMet and enableSS14
-        if checkRange(0, sellWindowBars, rsi, ss14RsiOp, ss14RsiVal) and checkRange(0, sellWindowBars, diPos, ss14DiOp, ss14DiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss14RsiOp, ss14RsiVal) and checkRange(0, signalWindowShort - 1, diPos, ss14DiOp, ss14DiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS14a: RSI" + ss14RsiOp + str.tostring(ss14RsiVal) + " DI+" + ss14DiOp + str.tostring(ss14DiVal)
     if not sCloseMet and enableSS14b
-        if checkRange(0, sellWindowBars, rsi, ss14bRsiOp, ss14bRsiVal) and checkRange(0, sellWindowBars, diPos, ss14bDiOp, ss14bDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss14bRsiOp, ss14bRsiVal) and checkRange(0, signalWindowShort - 1, diPos, ss14bDiOp, ss14bDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS14b: RSI" + ss14bRsiOp + str.tostring(ss14bRsiVal) + " DI+" + ss14bDiOp + str.tostring(ss14bDiVal)
     if not sCloseMet and enableSS14c
-        if checkRange(0, sellWindowBars, rsi, ss14cRsiOp, ss14cRsiVal) and checkRange(0, sellWindowBars, diPos, ss14cDiOp, ss14cDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss14cRsiOp, ss14cRsiVal) and checkRange(0, signalWindowShort - 1, diPos, ss14cDiOp, ss14cDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS14c: RSI" + ss14cRsiOp + str.tostring(ss14cRsiVal) + " DI+" + ss14cDiOp + str.tostring(ss14cDiVal)
     if not sCloseMet and enableSS14d
-        if checkRange(0, sellWindowBars, rsi, ss14dRsiOp, ss14dRsiVal) and checkRange(0, sellWindowBars, diPos, ss14dDiOp, ss14dDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss14dRsiOp, ss14dRsiVal) and checkRange(0, signalWindowShort - 1, diPos, ss14dDiOp, ss14dDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS14d: RSI" + ss14dRsiOp + str.tostring(ss14dRsiVal) + " DI+" + ss14dDiOp + str.tostring(ss14dDiVal)
     if not sCloseMet and enableSS15
-        if checkRange(0, sellWindowBars, vfi, ss15VfiOp, ss15VfiVal) and checkRange(0, sellWindowBars, diPos, ss15DiOp, ss15DiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss15VfiOp, ss15VfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss15DiOp, ss15DiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS15a: VFI" + ss15VfiOp + str.tostring(ss15VfiVal) + " DI+" + ss15DiOp + str.tostring(ss15DiVal)
     if not sCloseMet and enableSS15b
-        if checkRange(0, sellWindowBars, vfi, ss15bVfiOp, ss15bVfiVal) and checkRange(0, sellWindowBars, diPos, ss15bDiOp, ss15bDiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss15bVfiOp, ss15bVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss15bDiOp, ss15bDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS15b: VFI" + ss15bVfiOp + str.tostring(ss15bVfiVal) + " DI+" + ss15bDiOp + str.tostring(ss15bDiVal)
     if not sCloseMet and enableSS15c
-        if checkRange(0, sellWindowBars, vfi, ss15cVfiOp, ss15cVfiVal) and checkRange(0, sellWindowBars, diPos, ss15cDiOp, ss15cDiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss15cVfiOp, ss15cVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss15cDiOp, ss15cDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS15c: VFI" + ss15cVfiOp + str.tostring(ss15cVfiVal) + " DI+" + ss15cDiOp + str.tostring(ss15cDiVal)
     if not sCloseMet and enableSS15d
-        if checkRange(0, sellWindowBars, vfi, ss15dVfiOp, ss15dVfiVal) and checkRange(0, sellWindowBars, diPos, ss15dDiOp, ss15dDiVal)
+        if checkRange(0, signalWindowShort - 1, vfi, ss15dVfiOp, ss15dVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss15dDiOp, ss15dDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS15d: VFI" + ss15dVfiOp + str.tostring(ss15dVfiVal) + " DI+" + ss15dDiOp + str.tostring(ss15dDiVal)
     if not sCloseMet and enableSS16
-        if checkRange(0, sellWindowBars, rsi, ss16RsiOp, ss16RsiVal) and checkRange(0, sellWindowBars, vfi, ss16VfiOp, ss16VfiVal) and checkRange(0, sellWindowBars, diPos, ss16DiOp, ss16DiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss16RsiOp, ss16RsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss16VfiOp, ss16VfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss16DiOp, ss16DiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS16a: RSI" + ss16RsiOp + str.tostring(ss16RsiVal) + " VFI" + ss16VfiOp + str.tostring(ss16VfiVal) + " DI+" + ss16DiOp + str.tostring(ss16DiVal)
     if not sCloseMet and enableSS16b
-        if checkRange(0, sellWindowBars, rsi, ss16bRsiOp, ss16bRsiVal) and checkRange(0, sellWindowBars, vfi, ss16bVfiOp, ss16bVfiVal) and checkRange(0, sellWindowBars, diPos, ss16bDiOp, ss16bDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss16bRsiOp, ss16bRsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss16bVfiOp, ss16bVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss16bDiOp, ss16bDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS16b: RSI" + ss16bRsiOp + str.tostring(ss16bRsiVal) + " VFI" + ss16bVfiOp + str.tostring(ss16bVfiVal) + " DI+" + ss16bDiOp + str.tostring(ss16bDiVal)
     if not sCloseMet and enableSS16c
-        if checkRange(0, sellWindowBars, rsi, ss16cRsiOp, ss16cRsiVal) and checkRange(0, sellWindowBars, vfi, ss16cVfiOp, ss16cVfiVal) and checkRange(0, sellWindowBars, diPos, ss16cDiOp, ss16cDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss16cRsiOp, ss16cRsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss16cVfiOp, ss16cVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss16cDiOp, ss16cDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS16c: RSI" + ss16cRsiOp + str.tostring(ss16cRsiVal) + " VFI" + ss16cVfiOp + str.tostring(ss16cVfiVal) + " DI+" + ss16cDiOp + str.tostring(ss16cDiVal)
     if not sCloseMet and enableSS16d
-        if checkRange(0, sellWindowBars, rsi, ss16dRsiOp, ss16dRsiVal) and checkRange(0, sellWindowBars, vfi, ss16dVfiOp, ss16dVfiVal) and checkRange(0, sellWindowBars, diPos, ss16dDiOp, ss16dDiVal)
+        if checkRange(0, signalWindowShort - 1, rsi, ss16dRsiOp, ss16dRsiVal) and checkRange(0, signalWindowShort - 1, vfi, ss16dVfiOp, ss16dVfiVal) and checkRange(0, signalWindowShort - 1, diPos, ss16dDiOp, ss16dDiVal)
             sCloseMet := true
             sSignalBar := bar_index
             sCurCloseRsn := "SS16d: RSI" + ss16dRsiOp + str.tostring(ss16dRsiVal) + " VFI" + ss16dVfiOp + str.tostring(ss16dVfiVal) + " DI+" + ss16dDiOp + str.tostring(ss16dDiVal)
@@ -1840,18 +1870,25 @@ if shortIsOpen and sPhase == 2
         sPhase   := 0
         sLlFound := false
 
+if shortIsOpen and not na(sStopPrice)
+    strategy.exit("Short Stop", from_entry="Short", stop=sStopPrice, comment="Стоп Шорт")
+
 if sStopActive and shortIsOpen
     // Move stop down only (never up) using high[1]
     if close < close[1]
         sTrailStop := math.min(sTrailStop, high[1])
-    if close > sTrailStop
-        profitPct = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0  // Fixed P/L calculation
-        lblColor  = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
-        strategy.close("Short", comment="Стоп Шорт")
+        sStopPrice := sTrailStop
+    if close > sStopPrice
+        profitPct   = (not na(sEntryPrice) and sEntryPrice > 0) ? ((sEntryPrice - close) / sEntryPrice * 100) : 0.0
+        plStr       = "P/L: " + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%"
+        entryStr    = str.tostring(sEntryPrice, "#.##")
+        closeRsnStr = sCloseReason
+        lblColor    = profitPct >= 0 ? color.new(color.green, 10) : color.new(color.red, 10)
         // Reset all short state variables
         shortIsOpen := false
         sStopActive := false
         sTrailStop  := na
+        sStopPrice  := na
         sPhase      := 0
         sLlFound    := false
         sSignalBar  := na
@@ -1861,10 +1898,10 @@ if sStopActive and shortIsOpen
         sCloseReason := ""
         if showLabels
             label.new(bar_index, low,
-                      "ЗАКРЫТИЕ ШОРТА\n" + sCloseReason +
+                      "ЗАКРЫТИЕ ШОРТА\n" + closeRsnStr +
                       "\nЦена: "  + str.tostring(close, "#.##") +
-                      "\nВход: "  + str.tostring(sEntryPrice, "#.##") +
-                      "\nP/L: "   + (profitPct >= 0 ? "+" : "") + str.tostring(profitPct, "#.##") + "%",
+                      "\nВход: "  + entryStr +
+                      "\n" + plStr,
                       color=lblColor, textcolor=color.white,
                       style=label.style_label_up, size=size.normal)
 
