@@ -1419,7 +1419,7 @@ if longIsOpen and lPhase == 2
         lPhase   := 0
         lHhFound := false
 
-if longIsOpen
+if longIsOpen and not na(lStopPrice)
     strategy.exit("Long Stop", from_entry="Long", stop=lStopPrice, comment="Стоп Лонг")
 
 if lStopActive and longIsOpen
@@ -1866,7 +1866,7 @@ if shortIsOpen and sPhase == 2
         sPhase   := 0
         sLlFound := false
 
-if shortIsOpen
+if shortIsOpen and not na(sStopPrice)
     strategy.exit("Short Stop", from_entry="Short", stop=sStopPrice, comment="Стоп Шорт")
 
 if sStopActive and shortIsOpen
