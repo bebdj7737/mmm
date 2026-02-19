@@ -925,51 +925,51 @@ findSinglePivotPair(firstType, secondType, windowBack, windowFwd, signalBar) =>
 // Возвращает true только если ВСЕ включённые варианты найдены
 pivotMultiPatternDetector(useA, firstA, secondA, useB, firstB, secondB, useC, firstC, secondC, useD, firstD, secondD, windowBack, windowFwd, signalBar) =>
     // Проверяем сколько вариантов включено
-    enabledCount = 0
+    enabledVariantCount = 0
     if useA
-        enabledCount := enabledCount + 1
+        enabledVariantCount := enabledVariantCount + 1
     if useB
-        enabledCount := enabledCount + 1
+        enabledVariantCount := enabledVariantCount + 1
     if useC
-        enabledCount := enabledCount + 1
+        enabledVariantCount := enabledVariantCount + 1
     if useD
-        enabledCount := enabledCount + 1
+        enabledVariantCount := enabledVariantCount + 1
     
     // Если ни один вариант не включён - фильтр отключён (пропускает всё)
-    if enabledCount == 0
+    if enabledVariantCount == 0
         [true, "Фильтр отключен"]
     else
         // Проверяем каждый включённый вариант
-        foundCount = 0
-        explanations = ""
+        foundVariantCount = 0
+        patternSummary = ""
         
         if useA
             foundA = findSinglePivotPair(firstA, secondA, windowBack, windowFwd, signalBar)
             if foundA
-                foundCount := foundCount + 1
-                explanations := explanations + "A:" + firstA + "→" + secondA + " "
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "A:" + firstA + "→" + secondA + " "
         
         if useB
             foundB = findSinglePivotPair(firstB, secondB, windowBack, windowFwd, signalBar)
             if foundB
-                foundCount := foundCount + 1
-                explanations := explanations + "B:" + firstB + "→" + secondB + " "
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "B:" + firstB + "→" + secondB + " "
         
         if useC
             foundC = findSinglePivotPair(firstC, secondC, windowBack, windowFwd, signalBar)
             if foundC
-                foundCount := foundCount + 1
-                explanations := explanations + "C:" + firstC + "→" + secondC + " "
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "C:" + firstC + "→" + secondC + " "
         
         if useD
             foundD = findSinglePivotPair(firstD, secondD, windowBack, windowFwd, signalBar)
             if foundD
-                foundCount := foundCount + 1
-                explanations := explanations + "D:" + firstD + "→" + secondD + " "
+                foundVariantCount := foundVariantCount + 1
+                patternSummary := patternSummary + "D:" + firstD + "→" + secondD + " "
         
         // Все включённые варианты должны быть найдены (AND logic)
-        allFound = (foundCount == enabledCount)
-        finalExpl = allFound ? explanations : "Не все варианты найдены"
+        allFound = (foundVariantCount == enabledVariantCount)
+        finalExpl = allFound ? patternSummary : "Не все варианты найдены"
         
         [allFound, finalExpl]
 
