@@ -895,10 +895,10 @@ isFirstRedAfterGreen = isRed and greenCount[1] >= minRedCandles
 var string pivotDetectorResult = ""
 var int    barsInPosition      = 0
 
-var bool  longIsOpen   = false
-var bool  shortIsOpen  = false
-var float lEntryPrice  = na
-var float sEntryPrice  = na
+var bool   longIsOpen   = false
+var bool   shortIsOpen  = false
+var float  lEntryPrice  = na
+var float  sEntryPrice  = na
 
 // Подсчёт баров в позиции
 if strategy.position_size != 0
